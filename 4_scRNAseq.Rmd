@@ -1,6 +1,6 @@
 ---
 title: "Mapping targets to single cells in plaques."
-subtitle: Accompanying 'AE_TEMPLATE'
+subtitle: Accompanying 'CONVOCALS_downstream'
 author: '[Sander W. van der Laan, PhD](https://vanderlaanand.science) | s.w.vanderlaan[at]gmail[dot]com'
 date: '`r Sys.Date()`'
 output:

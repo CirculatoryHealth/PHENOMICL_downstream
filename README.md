@@ -87,24 +87,22 @@ The whole-slide images used in this project are available through a [DataverseNL
 
 ### Acknowledgements
 
-We are thankful for the support of the Netherlands CardioVascular Research Initiative of the Netherlands Heart Foundation (CVON 2011/B019 and CVON 2017-20: Generating the best evidence-based pharmaceutical targets for atherosclerosis [GENIUS I&II]), the ERA-CVD program 'druggable-MI-targets' (grant number: 01KL1802), and the Leducq Fondation 'PlaqOmics'.
+We are thankful for the support of the Netherlands CardioVascular Research Initiative of the Netherlands Heart Foundation (CVON 2011/B019 and CVON 2017-20: Generating the best evidence-based pharmaceutical targets for atherosclerosis [GENIUS I&II]), the ERA-CVD program 'druggable-MI-targets' (grant number: 01KL1802), the Leducq Fondation 'PlaqOmics' and ‘AtheroGen’, and the Chan Zuckerberg Initiative ‘MetaPlaq’. The research for this contribution was made possible by the AI for Health working group of the [EWUU alliance](https://aiforhealth.ewuu.nl/). The collaborative project ‘Getting the Perfect Image’ was co-financed through use of PPP Allowance awarded by Health~Holland, Top Sector Life Sciences & Health, to stimulate public-private partnerships.
 
-Funding for this research was provided by National Institutes of Health (NIH) grant nos. R00HL125912 and R01HL14823 (to Clint L. Miller), and a Leducq Foundation Transatlantic Network of Excellence ('PlaqOmics') grant no. 18CVD02 (to Dr. Clint L. Miller and Dr. Sander W. van der Laan), and EU H2020 TO_AITION grant no. 848146 (to Dr. Sander W. van der Laan).
+Funding for this research was provided by National Institutes of Health (NIH) grant nos. R00HL125912 and R01HL14823 (to Clint L. Miller), a Leducq Foundation Transatlantic Network of Excellence ('PlaqOmics') grant no. 18CVD02 (to Dr. Clint L. Miller and Dr. Sander W. van der Laan), the CZI funded 'MetaPlaq' (to Dr. Clint L. Miller and Dr. Sander W. van der Laan), EU HORIZON NextGen (grant number: 101136962, to Dr. Sander W. van der Laan), EU HORIZON MIRACLE (grant number: 101115381, to Dr. Sander W. van der Laan), and Health~Holland PPP Allowance ‘Getting the Perfect Image’ (to Dr. Sander W. van der Laan).
 
-Dr. Sander W. van der Laan has received Roche funding for unrelated work.
-
-Dr Craig A. Glastonbury has stock options in BenevolentAI and is a paid consultant for BenevolentAI, unrelated to this work.
+Dr Craig A. Glastonbury has stock options in BenevolentAI and is a paid consultant for BenevolentAI, unrelated to this work. Dr. Sander W. van der Laan was funded by Roche Diagnostics, as part of 'Getting the Perfect Image', however Roche was not involved in the conception, design, execution or in any other way, shape or form of this project. 
 
 Plaque samples are derived from arterial endarterectomies as part of the [Athero-Express Biobank Study](https://doi.org/10.1007/s10564-004-2304-6) which is an ongoing study in the UMC Utrecht. We would like to thank all the (former) employees involved in the Athero-Express Biobank Study of the Departments of Surgery of the St. Antonius Hospital Nieuwegein and University Medical Center Utrecht for their continuing work. In particular we would like to thank (in no particular order) Marijke Linschoten, Arjan Samani, Petra H. Homoed-van der Kraak, Tim Bezemer, Tim van de Kerkhof, Joyce Vrijenhoek, Evelyn Velema, Ben van Middelaar, Sander Reukema, Robin Reijers, Joëlle van Bennekom, and Bas Nelissen. Lastly, we would like to thank all participants of the Athero-Express Biobank Study; without you these studies would not be possible.
 
 The framework was based on the [`WORCS` package](https://osf.io/zcvbs/).
 
-<center><a href='https://www.era-cvd.eu'><img src="images/ERA_CVD_Logo_CMYK.png" align="center" height="75"/></a> <a href='https://www.to-aition.eu'><img src="images/to_aition.png" align="center" height="75"/></a> <a href='https://www.plaqomics.com'><img src="images/leducq-logo-large.png" align="center" height="75"/></a> <a href='https://www.fondationleducq.org'><img src="images/leducq-logo-small.png" align="center" height="75"/></a> <a href='https://osf.io/zcvbs/'><img src="images/worcs_icon.png" align="center" height="75"/></a> <a href='https://www.atheroexpress.nl'><img src="images/AE_Genomics_2010.png" align="center" height="100"/></a></center>
+<a href='https://uefconnect.uef.fi/en/group/miracle/'><img src='images/UEF_Miracle_Logo-07.png' align="center" height="75" /></a> <a href='https://www.to-aition.eu'><img src='images/to_aition.png' align="center" height="75" /></a> <a href='https://www.health-holland.com'><img src='images/logo_NL_HealthHollland_Wit-Oranje_RGB.png' align="center" height="35" /></a> <a href='https://www.nextgentools.eu'><img src='images/NextGen_1_Red.png' align="center" height="35" /></a> <a href='https://www.era-cvd.eu'><img src='images/ERA_CVD_Logo_CMYK.png' align="center" height="75" /></a> <a href=''><img src='images/leducq-logo-large.png' align="center" height="75" /></a> <a href='https://www.fondationleducq.org'><img src='images/leducq-logo-small.png' align="center" height="75" /></a> <a href='https://osf.io/zcvbs/'><img src='images/worcs_icon.png' align="center" height="75" /></a> <a href='https://doi.org/10.1007/s10564-004-2304-6'><img src='images/AE_Genomics_2010.png' align="center" height="100" /></a>
 
 #### Changes log
 
-    Version:      v1.0.1
-    Last update:  2022-10-04
+    Version:      v1.1.0
+    Last update:  2024-10-17
     Written by:   Francesco Cisternino; Craig Glastonbury; Sander W. van der Laan; Clint L. Miller; Yipei Song.
     Description:  CONVOCALS repository: classification of atherosclerotic histological whole-slide images
     Minimum requirements: R version 3.4.3 (2017-06-30) -- 'Single Candle', Mac OS X El Capitan
@@ -120,6 +118,7 @@ The framework was based on the [`WORCS` package](https://osf.io/zcvbs/).
     _W_
     
     Changes log
+    * v1.1.0 Major updates and re-organization. Added baseline table creation. Added WORCS metadata. Added details on funding. Added bulkRNAseq analyses. Added scRNAseq analyses.
     * v1.0.1 Updates and re-organization.
     * v1.0.0 Initial version. 
     
@@ -127,7 +126,7 @@ The framework was based on the [`WORCS` package](https://osf.io/zcvbs/).
 --------------
 
 #### Creative Commons BY-NC-ND 4.0
-##### Copyright (c) 2022 [Francesco Cisternino]() \| [Craig Glastonbury](https://github.com/GlastonburyC) \| [Sander W. van der Laan](https://github.com/swvanderlaan) \| [Clint L. Miller](https://github.com/clintmil) \| [Yipei Song](https://github.com/PetraSong) 
+##### Copyright (c) 2024 [Francesco Cisternino]() \| [Craig Glastonbury](https://github.com/GlastonburyC) \| [Sander W. van der Laan](https://github.com/swvanderlaan) \| [Clint L. Miller](https://github.com/clintmil) \| [Yipei Song](https://github.com/PetraSong) 
 
 <sup>This is a human-readable summary of (and not a substitute for) the [license](LICENSE). </sup>
 </br>

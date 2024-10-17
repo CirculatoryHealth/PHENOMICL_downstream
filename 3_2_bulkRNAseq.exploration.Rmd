@@ -1,30 +1,30 @@
 ---
 title: "Exploration bulkRNAseq analyses"
-subtitle: Accompanying 'AE_TEMPLATE'
+subtitle: Accompanying 'CONVOCALS_downstream'
 author: '[Sander W. van der Laan, PhD](https://vanderlaanand.science) | s.w.vanderlaan[at]gmail[dot]com'
-date: '`r Sys.Date()`'
+date: "`r Sys.Date()`"
 output:
-  html_notebook: 
+  html_notebook:
     cache: yes
     code_folding: hide
     collapse: yes
     df_print: paged
     fig.align: center
     fig_caption: yes
-    fig_height: 10
+    fig_height: 6
     fig_retina: 2
-    fig_width: 12
-    theme: paper
+    fig_width: 7
+    highlight: tango
+    theme: lumen
     toc: yes
     toc_float:
       collapsed: no
       smooth_scroll: yes
-    highlight: tango
-mainfont: Helvetica
+mainfont: Arial
 editor_options:
   chunk_output_type: inline
-bibliography: references.bib
-knit: worcs::cite_all
+# bibliography: references.bib
+# knit: worcs::cite_all
 ---
 
 # General Setup
@@ -132,8 +132,8 @@ Now you need to choose which of the datasets you will use for the downstream ana
 
 ## Log-transformed normalized data
 ```{r}
-AERNAScomboSE <- readRDS(file = paste0(OUT_loc, "/",Today,".AERNAScomboSEvst.CEA.1093pts.SE.after_qc.IC_academic.RDS"))
-# AERNAScomboSE <- readRDS(file = paste0(OUT_loc, "/20240109.AERNAScomboSEvst.CEA.1093pts.SE.after_qc.IC_academic.RDS"))
+AERNAScomboSE <- readRDS(file = paste0(OUT_loc, "/",Today,".AERNAScomboSEvst.CEA.1092pts.SE.after_qc.IC_academic.RDS"))
+# AERNAScomboSE <- readRDS(file = paste0(OUT_loc, "/20240109.AERNAScomboSEvst.CEA.1092pts.SE.after_qc.IC_academic.RDS"))
 
 ```
 
@@ -517,10 +517,10 @@ symbol_ensembl_gene_list_qc <- temp[temp$symbol %in% gene_list_qc,]$symbol_ensem
 ```{r}
 expression_wide2 <- expression_wide %>%
   left_join(expression_data_sample_mean, by = "study_number") %>%
-  dplyr::select(study_number, StudyName, symbol_ensembl_gene_list_qc, expression_value_sample)
+  dplyr::select(study_number, Gender, StudyName, symbol_ensembl_gene_list_qc, expression_value_sample)
 
 expression_long2 <- expression_wide2 %>%
-  gather(gene, expression_value, -study_number, -StudyName) %>%
+  gather(gene, expression_value, -study_number, -StudyName, -Gender) %>%
   mutate(gene = str_replace_all(gene, c("expression_value_sample" = "Random genes"))) #%>%
   # mutate(gene = factor(gene, levels = c("Random genes", gene_list_qc)))
 expression_long2
@@ -567,10 +567,103 @@ mean_1000_genes <- mean(expression_data_sample_mean$expression_value_sample)
   ggsave(filename = paste0(PLOT_loc, "/", Today, ".TargetExpression_vs_1000genes_by_AERNAStudy.pdf"), plot = last_plot())
   ggsave(filename = paste0(PLOT_loc, "/", Today, ".TargetExpression_vs_1000genes_by_AERNAStudy.ps"), plot = last_plot())
   
-  rm(p1, p2, temp )
+  rm(p1, p2)
 
 
 ```
+
+```{r}
+p3 <- ggpubr::ggboxplot(expression_long2,
+                          x = "gene",
+                          y = "expression_value",
+                          color = "Gender",
+                          palette = "npg",
+                          add = "jitter",
+                          add.params = list(size = 3, jitter = 0.3), 
+                          ylab = paste0("normalized expression ")
+                          ) +
+    geom_hline(yintercept = mean_1000_genes, linetype = "dashed", color = uithof_color[26], size = 0.4) + 
+    theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1, vjust = 1), # change orientation of x-axis labels
+          axis.text.y = element_text(size = 12),
+          axis.title.x = element_text(size = 14),
+          axis.title.y = element_text(size = 14)) 
+  p3
+  
+  ggsave(filename = paste0(PLOT_loc, "/", Today, ".TargetExpression_vs_1000genes_by_Gender.png"), plot = last_plot())
+  ggsave(filename = paste0(PLOT_loc, "/", Today, ".TargetExpression_vs_1000genes_by_Gender.pdf"), plot = last_plot())
+  ggsave(filename = paste0(PLOT_loc, "/", Today, ".TargetExpression_vs_1000genes_by_Gender.ps"), plot = last_plot())
+  
+  rm(p3, temp )
+```
+
+List all the `gene` for all unique genes where their mean expression is higher than the mean of the 1,000 random genes (`mean_1000_genes`).
+
+```{r}
+# calculate the mean for each gene in expression_long2
+expression_long2_mean <- expression_long2 %>%
+  group_by(gene) %>%
+  summarise(mean_expression = mean(expression_value))
+expression_long2_mean
+```
+
+
+```{r}
+expression_long2_high <- expression_long2_mean %>%
+  dplyr::filter(mean_expression > mean_1000_genes) %>%
+  dplyr::select(gene) %>%
+  dplyr::distinct(gene, .keep_all = TRUE)
+expression_long2_high
+```
+
+List all genes with expression lower than `mean_1000_genes`.
+
+```{r}
+expression_long2_low <- expression_long2_mean %>%
+  dplyr::filter(mean_expression < mean_1000_genes) %>%
+  dplyr::select(gene) %>%
+  dplyr::distinct(gene, .keep_all = TRUE)
+
+expression_long2_low
+```
+
+List all genes where the mean of their expression is higher or lower than the mean of 1,000 random genes, and where there is a statistical difference between gender.
+
+```{r}
+# 1. Calculate mean expression per gender per gene
+expression_long2_mean_gender <- expression_long2 %>%
+  dplyr::group_by(gene, Gender) %>%
+  dplyr::summarise(mean_expression = mean(expression_value), .groups = 'drop')
+
+# Print the mean expression per gender
+print(expression_long2_mean_gender)
+
+# 2. Perform a Wilcoxon rank-sum test (Mann-Whitney U test) for gender differences per gene
+expression_long2_mean_gender_t_test_results <- expression_long2 %>%
+  dplyr::group_by(gene) %>%
+  dplyr::summarise(wilcox_test = list(wilcox.test(expression_value ~ Gender)), .groups = 'drop') %>%
+  dplyr::mutate(p_value = sapply(wilcox_test, function(x) x$p.value)) %>%
+  dplyr::filter(p_value <= 0.05) %>% # Filter for p-values below 0.05
+  dplyr::arrange(p_value)  # Order by p-value in ascending order
+
+# Print the p-values from the t-tests
+print(expression_long2_mean_gender_t_test_results)
+
+# 3. Write the results to an Excel file using openxlsx
+# Create a new workbook
+wb <- createWorkbook()
+
+# Add a worksheet
+addWorksheet(wb, "Significant Genes")
+
+# Write the dataframe to the worksheet
+writeData(wb, "Significant Genes", expression_long2_mean_gender_t_test_results)
+
+# Save the workbook to an Excel file
+saveWorkbook(wb, paste0(OUT_loc, "/", Today,".iph_area_vst_dgea_gender_significant_genes.xlsx"), overwrite = TRUE)
+
+
+```
+
 
 ## Heatmaps for genes of interest
 
@@ -647,7 +740,7 @@ Next, we are constructing the `SummarizedExperiment`.
 ```{r RNAseq to SE}
 
 AERNAS_meta_data = c("SampleType", "RNAseqTech", "RNAseqType", "RNAseqQC",
-                     "StudyType", "StudyName", "StudyBiobank", "SampleSize")
+                     "StudyType", "StudyName", "Gender", "StudyBiobank", "SampleSize")
 
 cat("\n* making a SummarizedExperiment ...\n")
 # this is all the data passing RNAseq quality control and UMI-corrected
@@ -690,7 +783,7 @@ Sample list and clinical data.
 temp <- as.tibble(subset(colData(AERNAScomboSE_target), select = c("study_number", AERNAS_meta_data)))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE_target.CEA.1093pts.samplelist.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE_target.CEA.1092pts.samplelist.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -698,7 +791,7 @@ rm(temp)
 temp <- as.tibble(subset(colData(AERNAScomboSE_target), select = c("study_number", basetable_vars)))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE_target.CEA.1093pts.clinicaldata.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE_target.CEA.1092pts.clinicaldata.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -709,7 +802,7 @@ Assay data and gene information.
 temp <- as_tibble(assay(AERNAScomboSE_target))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE_target.CEA.1093pts.assay.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE_target.CEA.1092pts.assay.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -717,7 +810,7 @@ rm(temp)
 temp <- as_tibble(rowRanges(AERNAScomboSE_target))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE_target.CEA.1093pts.genedata.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE_target.CEA.1092pts.genedata.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -727,7 +820,7 @@ The subset as `SummarizedExperiment()` dataset in `RDS`-format.
 ```{r}
 
 # saveRDS(AERNASE, file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE_target.CEA.608pts.SE.after_qc.IC_commercial.RDS"))
-saveRDS(AERNAScomboSE_target, file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE_target.CEA.1093pts.SE.after_qc.IC_academic.RDS"))
+saveRDS(AERNAScomboSE_target, file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE_target.CEA.1092pts.SE.after_qc.IC_academic.RDS"))
 
 ```
 
@@ -736,9 +829,9 @@ saveRDS(AERNAScomboSE_target, file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE
 
 Here we just do a sanity check and compare the expression for a favorite gene.
 ```{r}
-ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAScomboSE_target), AERNAScomboSE_target@rowRanges$symbol == "PCSK9"))),
-                    x = "ENSG00000169174", 
-                    xlab = "PCSK9 (ENSG00000169174) expression\nlog-transformed, size corrected counts",
+ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAScomboSE_target), AERNAScomboSE_target@rowRanges$symbol == "HMOX1"))),
+                    x = "ENSG00000100292", 
+                    xlab = "HMOX1 (ENSG00000100292) expression\nlog-transformed, size corrected counts",
                     color = "white", fill =  uithof_color[20],
                     rug = F, add_density = F,
                     add = c("median"),
@@ -751,8 +844,8 @@ ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAScomboSE_target), AERNAScomboS
 
 --------------------------------------------------------------------------------
 
-    Version:      v1.0.0
-    Last update:  2024-01-09
+    Version:      v1.1.0
+    Last update:  2024-10-07
     Written by:   Sander W. van der Laan (s.w.vanderlaan-2[at]umcutrecht.nl).
     Description:  Script to load bulk RNA sequencing data, and perform gene expression analyses, and visualisations.
     Minimum requirements: R version 3.5.2 (2018-12-20) -- 'Eggshell Igloo', macOS Mojave (10.14.2).
@@ -768,6 +861,7 @@ ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAScomboSE_target), AERNAScomboS
     _W_
 
     **Changes log**
+    * v1.1.0 Added more detailed sub-analyses on the mean expression by gender. 
     * v1.0.0 Inital version. Re-arranged to explore the subset of data. 
 
 --------------------------------------------------------------------------------

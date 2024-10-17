@@ -1,30 +1,30 @@
 ---
 title: "Preparation bulkRNAseq"
-subtitle: Accompanying 'AE_TEMPLATE'
+subtitle: Accompanying 'CONVOCALS_downstream'
 author: '[Sander W. van der Laan, PhD](https://vanderlaanand.science) | s.w.vanderlaan[at]gmail[dot]com'
-date: '`r Sys.Date()`'
+date: "`r Sys.Date()`"
 output:
-  html_notebook: 
+  html_notebook:
     cache: yes
     code_folding: hide
     collapse: yes
     df_print: paged
     fig.align: center
     fig_caption: yes
-    fig_height: 10
+    fig_height: 6
     fig_retina: 2
-    fig_width: 12
-    theme: paper
+    fig_width: 7
+    highlight: tango
+    theme: lumen
     toc: yes
     toc_float:
       collapsed: no
       smooth_scroll: yes
-    highlight: tango
-mainfont: Helvetica
+mainfont: Arial
 editor_options:
   chunk_output_type: inline
-bibliography: references.bib
-knit: worcs::cite_all
+# bibliography: references.bib
+# knit: worcs::cite_all
 ---
 
 # General Setup
@@ -349,15 +349,15 @@ dim(aernas2_counts_raw_qc_umicorr_annotFilt)
 ```{r}
 aernas1_study_samples_bulk <- colnames(aernas1_counts_raw_qc_umicorr_annotFilt[, -(1:9)])
 length(aernas1_study_samples_bulk)
-# 622
+# 622 all AE > 621 this study
 study_samples_AEDBCEA <- c(AEDB.CEA$STUDY_NUMBER)
 length(study_samples_AEDBCEA)
-# 2595
+# 2595 all AE > 2585 this study
 
 aernas1_setdif_samples_AERNAS1vsAEDBCEA <- setdiff(aernas1_study_samples_bulk, study_samples_AEDBCEA)
-length(aernas1_setdif_samples_AERNAS1vsAEDBCEA) # 0
+length(aernas1_setdif_samples_AERNAS1vsAEDBCEA) # 0 all AE > 0 this study
 aernas1_setdif_samples_AEDBCEAvsAERNAS1 <- setdiff(study_samples_AEDBCEA, aernas1_study_samples_bulk)
-length(aernas1_setdif_samples_AEDBCEAvsAERNAS1) # 1973
+length(aernas1_setdif_samples_AEDBCEAvsAERNAS1) # 1973 all AE > 1964 this study
 
 AEDB_AERNAS1_filt <- AEDB.CEA[AEDB.CEA$STUDY_NUMBER %in% aernas1_study_samples_bulk,]
 table(AEDB_AERNAS1_filt$Artery_summary, AEDB_AERNAS1_filt$Gender)
@@ -370,12 +370,12 @@ length(aernas2_study_samples_bulk)
 # 471
 study_samples_AEDBCEA <- c(AEDB.CEA$STUDY_NUMBER)
 length(study_samples_AEDBCEA)
-# 2595
+# 2595 all AE > 2585 this study
 
 aernas2_setdif_samples_AERNAS2vsAEDBCEA <- setdiff(aernas2_study_samples_bulk, study_samples_AEDBCEA)
-length(aernas2_setdif_samples_AERNAS2vsAEDBCEA) # 0
+length(aernas2_setdif_samples_AERNAS2vsAEDBCEA) # 0 all AE > 0 this study
 aernas2_setdif_samples_AEDBCEAvsAERNAS2 <- setdiff(study_samples_AEDBCEA, aernas2_study_samples_bulk)
-length(aernas2_setdif_samples_AEDBCEAvsAERNAS2) # 2124
+length(aernas2_setdif_samples_AEDBCEAvsAERNAS2) # 2124 all AE > 2124 this study
 
 AEDB_AERNAS2_filt <- AEDB.CEA[AEDB.CEA$STUDY_NUMBER %in% aernas2_study_samples_bulk,]
 table(AEDB_AERNAS2_filt$Artery_summary, AEDB_AERNAS2_filt$Gender)
@@ -611,8 +611,8 @@ Next, we are constructing the `SummarizedExperiment`.
 cat("* loading data ...\n")
 
 # this is all the data passing RNAseq quality control and UMI-corrected
-# - includes 631 patients
-# - after filtering on informed consent and artery type, the end sample size should be 622
+# - includes 630 patients
+# - after filtering on informed consent and artery type, the end sample size should be 621
 # - after filtering on 'no commercial business' based on informed consent, there are fewer samples: 608
 dim(aernas1_counts_raw_qc_umicorr_annotFilt)
 dim(aernas1_counts)
@@ -622,11 +622,11 @@ head(aernas1_counts_raw_qc_umicorr_annotFilt)
 head(aernas1_counts)
 
 cat("  > meta data\n")
-temp_coldat <- data.frame(STUDY_NUMBER = names(aernas1_counts_raw_qc_umicorr_annotFilt[,10:631]), 
+temp_coldat <- data.frame(STUDY_NUMBER = names(aernas1_counts_raw_qc_umicorr_annotFilt[,10:630]), 
                           SampleType = "plaque", RNAseqTech = "CEL2-seq", RNAseqType = "3' RNAseq", RNAseqQC = "UMI-corrected", 
                           StudyType = "CEA", StudyName = "AERNAS1", StudyBiobank = "Athero-Express Biobank Study (AE)", SampleSize = "622",
                           InformedConsent = "ACADEMIC", 
-                          row.names = names(aernas1_counts_raw_qc_umicorr_annotFilt[,10:631]))
+                          row.names = names(aernas1_counts_raw_qc_umicorr_annotFilt[,10:630]))
 
 cat("  > clinical data\n")
 # bulkRNA_meta_clin_COMMERCIAL <- subset(bulkRNA_meta_clin, select = c("study_number", basetable_vars))
@@ -699,11 +699,11 @@ Here we create two datasets, but make sure, we retain information on which is wh
 
 ```{r }
 cat("* loading data ...\n")
-temp1_coldat <- data.frame(STUDY_NUMBER = names(aernas1_counts_raw_qc_umicorr_annotFilt[,10:631]), 
+temp1_coldat <- data.frame(STUDY_NUMBER = names(aernas1_counts_raw_qc_umicorr_annotFilt[,10:630]), 
                           SampleType = "plaque", RNAseqTech = "CEL2-seq", RNAseqType = "3' RNAseq", RNAseqQC = "UMI-corrected", 
                           StudyType = "CEA", StudyName = "AERNAS1", StudyBiobank = "Athero-Express Biobank Study (AE)", SampleSize = "622",
                           InformedConsent = "ACADEMIC",
-                          row.names = names(aernas1_counts_raw_qc_umicorr_annotFilt[,10:631]))
+                          row.names = names(aernas1_counts_raw_qc_umicorr_annotFilt[,10:630]))
 temp2_coldat <- data.frame(STUDY_NUMBER = names(aernas2_counts_raw_qc_umicorr_annotFilt[,10:480]), 
                           SampleType = "plaque", RNAseqTech = "CEL2-seq", RNAseqType = "3' RNAseq", RNAseqQC = "UMI-corrected", 
                           StudyType = "CEA", StudyName = "AERNAS2", StudyBiobank = "Athero-Express Biobank Study (AE)", SampleSize = "471",
@@ -835,7 +835,7 @@ cat("Construction of the SE\n")
                                 metadata = "Athero-Express RNAseq Study Combined: bulk RNA sequencing in carotid plaques accross two experiments, AERNAS1 (n=622) and AERNAS2 (n=471). Technology: CEL2-seq adapted for bulk RNA sequencing, thus 3'-focused. UMI-corrected"))
 
 cat("\n* removing intermediate files ...\n")
-rm(temp_1coldat, temp2_coldat, temp_coldat_clin) # we don't delete 'temp_coldata_merge' because we need it later down the line
+rm(temp1_coldat, temp2_coldat, temp_coldat_clin) # we don't delete 'temp_coldata_merge' because we need it later down the line
 
 ```
 
@@ -1118,11 +1118,11 @@ We will create a list of samples that should be included based on CEA, and havin
 
 ```{r}
 cat("  > meta data\n")
-temp_coldat <- data.frame(STUDY_NUMBER = names(aernas1_counts_raw_qc_umicorr_annotFilt[,10:631]), 
+temp_coldat <- data.frame(STUDY_NUMBER = names(aernas1_counts_raw_qc_umicorr_annotFilt[,10:630]), 
                           SampleType = "plaque", RNAseqTech = "CEL2-seq", RNAseqType = "3' RNAseq", RNAseqQC = "UMI-corrected", 
                           StudyType = "CEA", StudyName = "AERNAS1", StudyBiobank = "Athero-Express Biobank Study (AE)", SampleSize = "622",
                           InformedConsent = "ACADEMIC", 
-                          row.names = names(aernas1_counts_raw_qc_umicorr_annotFilt[,10:631]))
+                          row.names = names(aernas1_counts_raw_qc_umicorr_annotFilt[,10:630]))
 cat("  > clinical data\n")
 # bulkRNA_meta_clin_COMMERCIAL <- subset(bulkRNA_meta_clin, select = c("study_number", basetable_vars))
 aernas1_meta_clin_ACADEMIC <- subset(aernas1_meta_clin, select = c("study_number", basetable_vars))
@@ -1206,7 +1206,7 @@ temp <- as.tibble(subset(colData(AERNAS1SEnorm), select = c("STUDY_NUMBER", "Sam
 # rm(temp)
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEnorm.CEA.622pts.samplelist.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEnorm.CEA.621pts.samplelist.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1214,7 +1214,7 @@ rm(temp)
 temp <- as.tibble(colData(AERNAS1SEnorm))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEnorm.CEA.622pts.clinicaldata.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEnorm.CEA.621pts.clinicaldata.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1224,7 +1224,7 @@ rm(temp)
 temp <- as_tibble(assay(AERNAS1SEnorm))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEnorm.CEA.622pts.assay.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEnorm.CEA.621pts.assay.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1232,7 +1232,7 @@ rm(temp)
 temp <- as_tibble(rowRanges(AERNAS1SEnorm))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEnorm.CEA.622pts.rowRanges.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEnorm.CEA.621pts.rowRanges.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1271,7 +1271,7 @@ temp <- as.tibble(subset(colData(AERNAS1SEvst), select = c("STUDY_NUMBER", "Samp
 # rm(temp)
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEvst.CEA.622pts.samplelist.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEvst.CEA.621pts.samplelist.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1279,7 +1279,7 @@ rm(temp)
 temp <- as.tibble(colData(AERNAS1SEvst))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEvst.CEA.622pts.clinicaldata.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEvst.CEA.621pts.clinicaldata.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1290,7 +1290,7 @@ rm(temp)
 temp <- as_tibble(assay(AERNAS1SEvst))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEvst.CEA.622pts.assay.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEvst.CEA.621pts.assay.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1298,7 +1298,7 @@ rm(temp)
 temp <- as_tibble(rowRanges(AERNAS1SEvst))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEvst.CEA.622pts.rowRanges.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAS1SEvst.CEA.621pts.rowRanges.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1564,7 +1564,6 @@ We will create a list of samples that should be included based on CEA, and havin
 
 We grep the meta- and clinical data from the `SummarizedExperiment`.
 ```{r}
-
 temp_coldat_clin <- data.frame(colData(AERNAScomboSE))
 dim(temp_coldat_clin)
 head(temp_coldat_clin)
@@ -1578,7 +1577,7 @@ temp <- as.tibble(subset(colData(AERNAScomboSE), select = c("STUDY_NUMBER", "Sam
                                                         "StudyType", "StudyName", "StudyBiobank", "SampleSize", 
                                                         "InformedConsent")))
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScombo.CEA.1093pts.samplelist.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScombo.CEA.1092pts.samplelist.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1586,7 +1585,7 @@ rm(temp)
 temp <- as.tibble(colData(AERNAScomboSE))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScombo.CEA.1093pts.clinicaldata.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScombo.CEA.1092pts.clinicaldata.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1594,7 +1593,7 @@ rm(temp)
 temp <- as_tibble(assay(AERNAScomboSE))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScombo.CEA.1093pts.assay.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScombo.CEA.1092pts.assay.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1602,7 +1601,7 @@ rm(temp)
 temp <- as_tibble(rowRanges(AERNAScomboSE))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScombo.CEA.1093pts.rowRanges.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScombo.CEA.1092pts.rowRanges.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1617,7 +1616,7 @@ Applied size correction before normalization.
 (AERNAScomboSEnorm <- SummarizedExperiment(assays = list(counts = normalized_counts),
                                 colData = temp_coldat_clin,
                                 rowRanges = combined_counts_rowRanges,
-                                metadata = "Athero-Express RNAseq Study Combined: bulk RNA sequencing in carotid plaques accross two experiments, AERNAS1 (n=622) and AERNAS2 (n=471). Technology: CEL2-seq adapted for bulk RNA sequencing, thus 3'-focused. UMI-corrected. Size corrected normalization."))
+                                metadata = "Athero-Express RNAseq Study Combined: bulk RNA sequencing in carotid plaques accross two experiments, AERNAS1 (n=621) and AERNAS2 (n=471). Technology: CEL2-seq adapted for bulk RNA sequencing, thus 3'-focused. UMI-corrected. Size corrected normalization."))
 
 ```
 
@@ -1641,7 +1640,7 @@ temp <- as.tibble(subset(colData(AERNAScomboSEnorm), select = c("STUDY_NUMBER", 
 # rm(temp)
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEnorm.CEA.1093pts.samplelist.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEnorm.CEA.1092pts.samplelist.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1649,7 +1648,7 @@ rm(temp)
 temp <- as.tibble(colData(AERNAScomboSEnorm))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEnorm.CEA.1093pts.clinicaldata.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEnorm.CEA.1092pts.clinicaldata.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1659,7 +1658,7 @@ rm(temp)
 temp <- as_tibble(assay(AERNAScomboSEnorm))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEnorm.CEA.1093pts.assay.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEnorm.CEA.1092pts.assay.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1667,7 +1666,7 @@ rm(temp)
 temp <- as_tibble(rowRanges(AERNAScomboSEnorm))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEnorm.CEA.1093pts.rowRanges.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEnorm.CEA.1092pts.rowRanges.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1682,7 +1681,7 @@ Log-transform the counts using `vst`.
 (AERNAScomboSEvst <- SummarizedExperiment(assays = list(counts = assay(AERNAScombovsd)),
                                 colData = temp_coldat_clin,
                                 rowRanges = combined_counts_rowRanges,
-                                metadata = "Athero-Express RNAseq Study Combined: bulk RNA sequencing in carotid plaques accross two experiments, AERNAS1 (n=622) and AERNAS2 (n=471). Technology: CEL2-seq adapted for bulk RNA sequencing, thus 3'-focused. UMI-corrected. Size corrected normalization. log-transformed."))
+                                metadata = "Athero-Express RNAseq Study Combined: bulk RNA sequencing in carotid plaques accross two experiments, AERNAS1 (n=621) and AERNAS2 (n=471). Technology: CEL2-seq adapted for bulk RNA sequencing, thus 3'-focused. UMI-corrected. Size corrected normalization. log-transformed."))
 
 ```
 
@@ -1706,7 +1705,7 @@ temp <- as.tibble(subset(colData(AERNAScomboSEvst), select = c("STUDY_NUMBER", "
 # rm(temp)
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEvst.CEA.1093pts.samplelist.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEvst.CEA.1092pts.samplelist.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1714,7 +1713,7 @@ rm(temp)
 temp <- as.tibble(colData(AERNAScomboSEvst))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEvst.CEA.1093pts.clinicaldata.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEvst.CEA.1092pts.clinicaldata.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1725,7 +1724,7 @@ rm(temp)
 temp <- as_tibble(assay(AERNAScomboSEvst))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEvst.CEA.1093pts.assay.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEvst.CEA.1092pts.assay.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1733,7 +1732,7 @@ rm(temp)
 temp <- as_tibble(rowRanges(AERNAScomboSEvst))
 
 fwrite(temp,
-       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEvst.CEA.1093pts.rowRanges.after_qc.IC_academic.csv"),
+       file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEvst.CEA.1092pts.rowRanges.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
@@ -1746,27 +1745,27 @@ rm(temp)
 Here we just do a sanity check and compare the expression for a favorite gene.
 ```{r}
 
-ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAS1SE), AERNAS1SE@rowRanges$symbol == "PCSK9"))),
-                    x = "ENSG00000169174", 
-                    xlab = "PCSK9 (ENSG00000169174) expression\nraw counts | AERNAS1",
+ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAS1SE), AERNAS1SE@rowRanges$symbol == "HMOX1"))),
+                    x = "ENSG00000100292", 
+                    xlab = "HMOX1 (ENSG00000100292) expression\nraw counts | AERNAS1",
                     color = "white", fill =  uithof_color[8],
                     rug = F, add_density = F,
                     add = c("median"),
                     add.params = list(color = uithof_color[3]), 
                     ggtheme = theme_pubclean())
 
-ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAS1SEnorm), AERNAS1SEnorm@rowRanges$symbol == "PCSK9"))),
-                    x = "ENSG00000169174", 
-                    xlab = "PCSK9 (ENSG00000169174) expression\nnormalized, size corrected counts | AERNAS1",
+ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAS1SEnorm), AERNAS1SEnorm@rowRanges$symbol == "HMOX1"))),
+                    x = "ENSG00000100292", 
+                    xlab = "HMOX1 (ENSG00000100292) expression\nnormalized, size corrected counts | AERNAS1",
                     color = "white", fill =  uithof_color[17],
                     rug = F, add_density = F,
                     add = c("median"),
                     add.params = list(color = uithof_color[3]), 
                     ggtheme = theme_pubclean())
 
-ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAS1SEvst), AERNAS1SEvst@rowRanges$symbol == "PCSK9"))),
-                    x = "ENSG00000169174", 
-                    xlab = "PCSK9 (ENSG00000169174) expression\nlog-transformed, size corrected counts | AERNAS1",
+ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAS1SEvst), AERNAS1SEvst@rowRanges$symbol == "HMOX1"))),
+                    x = "ENSG00000100292", 
+                    xlab = "HMOX1 (ENSG00000100292) expression\nlog-transformed, size corrected counts | AERNAS1",
                     color = "white", fill =  uithof_color[20],
                     rug = F, add_density = F,
                     add = c("median"),
@@ -1780,27 +1779,27 @@ ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAS1SEvst), AERNAS1SEvst@rowRang
 Here we just do a sanity check and compare the expression for a favorite gene.
 ```{r}
 
-ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAS2SE), AERNAS2SE@rowRanges$symbol == "PCSK9"))),
-                    x = "ENSG00000169174", 
-                    xlab = "PCSK9 (ENSG00000169174) expression\nraw counts | AERNAS2",
+ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAS2SE), AERNAS2SE@rowRanges$symbol == "HMOX1"))),
+                    x = "ENSG00000100292", 
+                    xlab = "HMOX1 (ENSG00000100292) expression\nraw counts | AERNAS2",
                     color = "white", fill =  uithof_color[8],
                     rug = F, add_density = F,
                     add = c("median"),
                     add.params = list(color = uithof_color[3]), 
                     ggtheme = theme_pubclean())
 
-ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAS2SEnorm), AERNAS2SEnorm@rowRanges$symbol == "PCSK9"))),
-                    x = "ENSG00000169174", 
-                    xlab = "PCSK9 (ENSG00000169174) expression\nnormalized, size corrected counts | AERNAS2",
+ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAS2SEnorm), AERNAS2SEnorm@rowRanges$symbol == "HMOX1"))),
+                    x = "ENSG00000100292", 
+                    xlab = "HMOX1 (ENSG00000100292) expression\nnormalized, size corrected counts | AERNAS2",
                     color = "white", fill =  uithof_color[17],
                     rug = F, add_density = F,
                     add = c("median"),
                     add.params = list(color = uithof_color[3]), 
                     ggtheme = theme_pubclean())
 
-ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAS2SEvst), AERNAS2SEvst@rowRanges$symbol == "PCSK9"))),
-                    x = "ENSG00000169174", 
-                    xlab = "PCSK9 (ENSG00000169174) expression\nlog-transformed, size corrected counts | AERNAS2",
+ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAS2SEvst), AERNAS2SEvst@rowRanges$symbol == "HMOX1"))),
+                    x = "ENSG00000100292", 
+                    xlab = "HMOX1 (ENSG00000100292) expression\nlog-transformed, size corrected counts | AERNAS2",
                     color = "white", fill =  uithof_color[20],
                     rug = F, add_density = F,
                     add = c("median"),
@@ -1813,42 +1812,42 @@ ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAS2SEvst), AERNAS2SEvst@rowRang
 Here we just do a sanity check and compare the expression for a favorite gene.
 ```{r}
 temp = as.data.frame(colData(AERNAScomboSE))
-temp2 <- cbind(as.tibble(t(subset(assay(AERNAScomboSE), AERNAScomboSE@rowRanges$symbol == "PCSK9"))), temp)
+temp2 <- cbind(as.tibble(t(subset(assay(AERNAScomboSE), AERNAScomboSE@rowRanges$symbol == "HMOX1"))), temp)
 ggpubr::gghistogram(temp2,
-                    x = "ENSG00000169174", 
-                    xlab = "PCSK9 (ENSG00000169174) expression\nraw counts | AERNASCombined",
+                    x = "ENSG00000100292", 
+                    xlab = "HMOX1 (ENSG00000100292) expression\nraw counts | AERNASCombined",
                     color = "white", fill =  "StudyName", palette = "npg", # c(uithof_color[6], uithof_color[20]),
                     rug = F, add_density = F,
                     add = c("median"),
                     add.params = list(linetype = 2), 
                     ggtheme = theme_pubclean())
-ggsave(filename = paste0(PLOT_loc, "/", Today, ".PCSK9_ENSG00000170323_GRCh38p13_EnsDb86.AERNACombinedRAW.CEA.1093pts.pdf"), device = "pdf", 
+ggsave(filename = paste0(PLOT_loc, "/", Today, ".HMOX1_ENSG00000170323_GRCh38p13_EnsDb86.AERNACombinedRAW.CEA.1092pts.pdf"), device = "pdf", 
        dpi = 300, width = 12, height = 7, plot = last_plot())
 
 temp = as.data.frame(colData(AERNAScomboSEnorm))
-temp2 <- cbind(as.tibble(t(subset(assay(AERNAScomboSEnorm), AERNAScomboSEnorm@rowRanges$symbol == "PCSK9"))), temp)
+temp2 <- cbind(as.tibble(t(subset(assay(AERNAScomboSEnorm), AERNAScomboSEnorm@rowRanges$symbol == "HMOX1"))), temp)
 ggpubr::gghistogram(temp2,
-                    x = "ENSG00000169174", 
-                    xlab = "PCSK9 (ENSG00000169174) expression\nnormalized, size corrected counts | AERNASCombined",
+                    x = "ENSG00000100292", 
+                    xlab = "HMOX1 (ENSG00000100292) expression\nnormalized, size corrected counts | AERNASCombined",
                     color = "white", fill =  "StudyName", palette = "npg", # c(uithof_color[6], uithof_color[20]),
                     rug = F, add_density = F,
                     add = c("median"),
                     add.params = list(linetype = 2), 
                     ggtheme = theme_pubclean())
-ggsave(filename = paste0(PLOT_loc, "/", Today, ".PCSK9_ENSG00000170323_GRCh38p13_EnsDb86.AERNACombinedNORM.CEA.1093pts.pdf"), device = "pdf", 
+ggsave(filename = paste0(PLOT_loc, "/", Today, ".HMOX1_ENSG00000170323_GRCh38p13_EnsDb86.AERNACombinedNORM.CEA.1092pts.pdf"), device = "pdf", 
        dpi = 300, width = 12, height = 7, plot = last_plot())
 
 temp = as.data.frame(colData(AERNAScomboSEvst))
-temp2 <- cbind(as.tibble(t(subset(assay(AERNAScomboSEvst), AERNAScomboSEvst@rowRanges$symbol == "PCSK9"))), temp)
+temp2 <- cbind(as.tibble(t(subset(assay(AERNAScomboSEvst), AERNAScomboSEvst@rowRanges$symbol == "HMOX1"))), temp)
 ggpubr::gghistogram(temp2,
-                    x = "ENSG00000169174", 
-                    xlab = "PCSK9 (ENSG00000169174) expression\nlog-transformed, size corrected counts | AERNASCombined",
+                    x = "ENSG00000100292", 
+                    xlab = "HMOX1 (ENSG00000100292) expression\nlog-transformed, size corrected counts | AERNASCombined",
                     color = "white", fill =  "StudyName", palette = "npg", # c(uithof_color[6], uithof_color[20]),
                     rug = F, add_density = F,
                     add = c("median"),
                     add.params = list(linetype = 2), 
                     ggtheme = theme_pubclean())
-ggsave(filename = paste0(PLOT_loc, "/", Today, ".PCSK9_ENSG00000170323_GRCh38p13_EnsDb86.AERNACombinedVST.CEA.1093pts.pdf"), device = "pdf", 
+ggsave(filename = paste0(PLOT_loc, "/", Today, ".HMOX1_ENSG00000170323_GRCh38p13_EnsDb86.AERNACombinedVST.CEA.1092pts.pdf"), device = "pdf", 
        dpi = 300, width = 12, height = 7, plot = last_plot())
 
 rm(temp, temp2)
@@ -1862,9 +1861,9 @@ rm(temp, temp2)
 ```{r}
 
 # saveRDS(AERNA1SE, file = paste0(OUT_loc, "/", Today, ".AERNAS1.CEA.608pts.SE.after_qc.IC_commercial.RDS"))
-saveRDS(AERNAS1SE, file = paste0(OUT_loc, "/", Today, ".AERNAS1.CEA.622pts.SE.after_qc.IC_academic.RDS"))
-saveRDS(AERNAS1SEnorm, file = paste0(OUT_loc, "/", Today, ".AERNAS1SEnorm.CEA.622pts.SE.after_qc.IC_academic.RDS"))
-saveRDS(AERNAS1SEvst, file = paste0(OUT_loc, "/", Today, ".AERNAS1SEvst.CEA.622pts.SE.after_qc.IC_academic.RDS"))
+saveRDS(AERNAS1SE, file = paste0(OUT_loc, "/", Today, ".AERNAS1.CEA.621pts.SE.after_qc.IC_academic.RDS"))
+saveRDS(AERNAS1SEnorm, file = paste0(OUT_loc, "/", Today, ".AERNAS1SEnorm.CEA.621pts.SE.after_qc.IC_academic.RDS"))
+saveRDS(AERNAS1SEvst, file = paste0(OUT_loc, "/", Today, ".AERNAS1SEvst.CEA.621pts.SE.after_qc.IC_academic.RDS"))
 
 ```
 
@@ -1883,9 +1882,9 @@ saveRDS(AERNAS2SEvst, file = paste0(OUT_loc, "/", Today, ".AERNAS2SEvst.CEA.471p
 ```{r}
 
 # saveRDS(AERNA2SE, file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE.CEA.xxxpts.SE.after_qc.IC_commercial.RDS"))
-saveRDS(AERNAScomboSE, file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE.CEA.1093pts.SE.after_qc.IC_academic.RDS"))
-saveRDS(AERNAScomboSEnorm, file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEnorm.CEA.1093pts.SE.after_qc.IC_academic.RDS"))
-saveRDS(AERNAScomboSEvst, file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEvst.CEA.1093pts.SE.after_qc.IC_academic.RDS"))
+saveRDS(AERNAScomboSE, file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE.CEA.1092pts.SE.after_qc.IC_academic.RDS"))
+saveRDS(AERNAScomboSEnorm, file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEnorm.CEA.1092pts.SE.after_qc.IC_academic.RDS"))
+saveRDS(AERNAScomboSEvst, file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEvst.CEA.1092pts.SE.after_qc.IC_academic.RDS"))
 
 ```
 
@@ -1894,8 +1893,8 @@ saveRDS(AERNAScomboSEvst, file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEvst.
 
 --------------------------------------------------------------------------------
 
-    Version:      v1.2.0
-    Last update:  2024-01-09
+    Version:      v1.2.1
+    Last update:  2024-10-07
     Written by:   Sander W. van der Laan (s.w.vanderlaan-2[at]umcutrecht.nl).
     Description:  Script to load bulk RNA sequencing data, and perform gene expression analyses, and visualisations.
     Minimum requirements: R version 3.5.2 (2018-12-20) -- 'Eggshell Igloo', macOS Mojave (10.14.2).
@@ -1911,6 +1910,7 @@ saveRDS(AERNAScomboSEvst, file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEvst.
     _W_
 
     **Changes log**
+    * v1.2.1 Small changes to the code due to sample selection (621 sample in AERNAS1, 471 samples in AERNAS2, and 1092 samples in AERNAScombo).
     * v1.2.0 Major overhaul to prepare bulkRNAseq with new data. 
     * v1.1.1 Fixed baseline table writing. Additional versions of saved data. Added example to 'melt' data using `mia`.
     * v1.1.0 Update to bulk RNAseq data - deeper sequencing data is now available. Update to the study database.
@@ -1944,7 +1944,6 @@ rm(AERNAScombovsd,AERNAScombodds,
 
 
 ```{r Saving}
-
 save.image(paste0(PROJECT_loc, "/",Today,".",PROJECTNAME,".bulkRNAseq.preparation.RData"))
 ```
 

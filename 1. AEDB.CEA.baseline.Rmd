@@ -1,6 +1,7 @@
 ---
 title: "Baseline characteristics"
-author: "[Sander W. van der Laan, PhD](https://swvanderlaan.github.io) | @swvanderlaan | s.w.vanderlaan@gmail.com"
+subtitle: Accompanying 'CONVOCALS_downstream'
+author: '[Sander W. van der Laan, PhD](https://vanderlaanand.science) | s.w.vanderlaan[at]gmail[dot]com'
 date: "`r Sys.Date()`"
 output:
   html_notebook:
@@ -20,7 +21,6 @@ output:
       collapsed: no
       smooth_scroll: yes
 mainfont: Arial
-subtitle: Accompanying 'CONVOCALS_downstream'
 editor_options:
   chunk_output_type: inline
 # bibliography: references.bib
@@ -1652,5 +1652,6 @@ save.image(paste0(PROJECT_loc, "/",Today,".",PROJECTNAME,".AEDB.CEA.baseline.RDa
 ```
 
 +-----------------------------------------------------------------------------------------------------------------------------------------+
-| <sup>© 1979-2022 Sander W. van der Laan | s.w.vanderlaan[at]gmail.com | [swvanderlaan.github.io](https://swvanderlaan.github.io).</sup> |
+| <sup>© 1979-2024 Sander W. van der Laan | s.w.vanderlaan[at]gmail[dot]com | [vanderlaanand.science](https://vanderlaanand.science).</sup> |
 +-----------------------------------------------------------------------------------------------------------------------------------------+
+
