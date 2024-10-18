@@ -47,5 +47,9 @@ mamba install bioconda::bcftools bioconda::samtools bioconda::vcftools bioconda:
 echo "> Installing gwaslab version 3.4.46..."
 pip install gwaslab==3.4.46
 
+# Make sure to simlink libunwind
+echo "> Creating a symlink for libunwind..."
+sudo ln -sv /usr/local/Cellar/llvm/19.1.2/lib/unwind/libunwind.1.dylib /usr/local/lib/libunwind.1.dylib
+
 # Confirm installation
 echo "Installation complete!"

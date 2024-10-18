@@ -1,6 +1,6 @@
 ---
 title: "Main bulkRNAseq analyses"
-subtitle: Accompanying 'AE_TEMPLATE'
+subtitle: Accompanying 'CONVOCALS_downstream'
 author: '[Sander W. van der Laan, PhD](https://vanderlaanand.science) | s.w.vanderlaan[at]gmail[dot]com'
 date: '`r Sys.Date()`'
 output:
@@ -100,13 +100,18 @@ In case some genes are not available in our data we could filter them here.
 gene_list
 ```
 
-This code is just an example to filter the list from genes that are not in the data.
+This is to filter the list from genes that are not in the data.
 
-- _COL3A_ ==> not found
-- _COL2A_ ==> not found
+- _ND6_ ==> _MTND6_, not found
+- _TRIM49D1_ ==> _TRIM49DP_, not found
+- _ND4L_ ==> _MTND4L_, not found
+- _ATP8_ ==> _MTATP8_, not found
+- _RNASE1_ ==> _RNS1_, not found
 
-```{r filter target genes}
-gene_list_rm <- c("COL3A", "COL2A") 
+
+```{r Visualisation: preparation}
+
+gene_list_rm <- c("ND6", "TRIM49D1", "ND4L", "ATP8", "RNASE1")
 
 temp = gene_list[!gene_list %in% gene_list_rm]
 
@@ -126,16 +131,16 @@ gene_list_qc <- c(temp)
 We simply load the previously saved `RDS`-file and extract the clinical and RNAseq data from that.
 
 ```{r LoadAEDB}
-AEDB.CEA <- readRDS(file = paste0(OUT_loc, "/",Today,".",PROJECTNAME,".AEDB.CEA.RDS"))
-# AEDB.CEA <- readRDS(file = paste0(OUT_loc, "/20240531.",PROJECTNAME,".AEDB.CEA.RDS"))
+# AEDB.CEA <- readRDS(file = paste0(OUT_loc, "/",Today,".",PROJECTNAME,".AEDB.CEA.RDS"))
+AEDB.CEA <- readRDS(file = paste0(OUT_loc, "/20241017.",PROJECTNAME,".AEDB.CEA.RDS"))
 AEDB.CEA$STUDY_NUMBER <- paste0("ae", AEDB.CEA$STUDY_NUMBER)
 head(AEDB.CEA$STUDY_NUMBER)
 
-AERNASE <- readRDS(file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEvst.CEA.1093pts.SE.after_qc.IC_academic.RDS"))
-# AERNASE <- readRDS(file = paste0(OUT_loc, "/20240109.AERNAScomboSEvst.CEA.1093pts.SE.after_qc.IC_academic.RDS"))
+# AERNASE <- readRDS(file = paste0(OUT_loc, "/", Today, ".AERNAScomboSEvst.CEA.1092pts.SE.after_qc.IC_academic.RDS"))
+AERNASE <- readRDS(file = paste0(OUT_loc, "/20241017.AERNAScomboSEvst.CEA.1092pts.SE.after_qc.IC_academic.RDS"))
 
-AERNASE.targets <- readRDS(file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE_target.CEA.1093pts.SE.after_qc.IC_academic.RDS"))
-# AERNASE.targets <- readRDS(file = paste0(OUT_loc, "/20240109.AERNAScomboSE_target.CEA.1093pts.SE.after_qc.IC_academic.RDS"))
+# AERNASE.targets <- readRDS(file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE_target.CEA.1092pts.SE.after_qc.IC_academic.RDS"))
+AERNASE.targets <- readRDS(file = paste0(OUT_loc, "/20241017.AERNAScomboSE_target.CEA.1092pts.SE.after_qc.IC_academic.RDS"))
 
 ```
 
@@ -1156,63 +1161,28 @@ The _secondary outcomes_ will be
   - sudden death
   - fatal heart failure
   - fatal aneurysm rupture
-  - other cardiovascular death..
-
-### 30- and 90-days FU events
-
-We will use 3-year follow-up, but we will also calculate 30 days and 90 days follow-up 'time-to-event' variables. On average there are 365.25 days in a year. We can calculate 30-days and 90-days follow-up time based on the three years follow-up. 
-
-```{r}
-cutt.off.30days = (1/365.25) * 30
-cutt.off.90days = (1/365.25) * 90
-
-# Fix maximum FU of 30 and 90 days
-AEDB.CEA <- AEDB.CEA %>%
-  mutate(
-    FU.cutt.off.30days = ifelse(max.followup <= cutt.off.30days, max.followup, cutt.off.30days),
-    FU.cutt.off.90days = ifelse(max.followup <= cutt.off.90days, max.followup, cutt.off.90days)
-  ) 
-
-AEDB.temp <- subset(AEDB.CEA,  select = c("STUDY_NUMBER", "Age", "Gender", "Hospital", "Artery_summary", 
-                                      "max.followup", 
-                                      "FU.cutt.off.3years",
-                                      "FU.cutt.off.30days", 
-                                      "FU.cutt.off.90days"))
-require(labelled)
-AEDB.temp$Gender <- to_factor(AEDB.temp$Gender)
-AEDB.temp$Hospital <- to_factor(AEDB.temp$Hospital)
-AEDB.temp$Artery_summary <- to_factor(AEDB.temp$Artery_summary)
-
-DT::datatable(AEDB.temp[1:10,], caption = "Excerpt of the whole AEDB.", rownames = FALSE)
-
-rm(AEDB.temp)
-```
+  - other cardiovascular death.
 
 
 
 ```{r}
-
 AERNASE.clin.targets <- merge(AERNASE.clin.targets, 
                             subset(AEDB.CEA, select = c("STUDY_NUMBER", "max.followup", 
-                                                        "FU.cutt.off.3years", "FU.cutt.off.30days", "FU.cutt.off.90days",
-                                                        "ep_major_t_3years", "ep_stroke_t_3years", "ep_coronary_t_3years",
-                                                        "ep_cvdeath_t_3years",
-                                                        "epstroke.3years", "epcoronary.3years", "epcvdeath.3years"
+                                                        "FU.cutt.off.3years", 
+                                                        "ep_major_t_3years"
+                                                        # , "ep_stroke_t_3years", "ep_coronary_t_3years",
+                                                        # "ep_cvdeath_t_3years",
+                                                        # "epstroke.3years", "epcoronary.3years", "epcvdeath.3years"
                                                         )), 
                             by.x = "study_number", by.y = "STUDY_NUMBER", sort = TRUE)
-
 
 ```
 
 
 ```{r Calculate new FU cut-offs: maximum FU}
-
-
 AERNASE.clin.targets.temp <- subset(AERNASE.clin.targets,  select = c("study_number", "Age", "Gender", "Hospital", "Artery_summary", 
                                       "max.followup", 
-                                      "FU.cutt.off.3years",
-                                      "FU.cutt.off.30days", 
-                                      "FU.cutt.off.90days"))
+                                      "FU.cutt.off.3years"))
 require(labelled)
 AERNASE.clin.targets.temp$Gender <- to_factor(AERNASE.clin.targets.temp$Gender)
 AERNASE.clin.targets.temp$Hospital <- to_factor(AERNASE.clin.targets.temp$Hospital)
@@ -1222,89 +1192,9 @@ DT::datatable(AERNASE.clin.targets.temp[1:10,], caption = "Excerpt of the whole 
 
 rm(AERNASE.clin.targets.temp)
 
-
-```
-
-Here we will calculate the new 30- and 90-days follow-up of the events and their event-times of interest:
-
-- MACE (`epmajor.3years`)
-- Stroke (`epstroke.3years`)
-- Coronary events (`epcoronary.3years`)
-- Cardiovascular death (`epcvdeath.3years`)
-
-
-```{r Calculate new FU cut-offs: times}
-avg_days_in_year = 365.25
-cutt.off.30days.scaled <- cutt.off.30days * 365.25
-cutt.off.90days.scaled <- cutt.off.90days * 365.25
-# Event times
-
-AERNASE.clin.targets <- AERNASE.clin.targets %>%
-  mutate(
-    ep_major_t_30days = ifelse(ep_major_t_3years * avg_days_in_year <= cutt.off.30days.scaled, 
-                               ep_major_t_3years * avg_days_in_year, cutt.off.30days.scaled),
-    ep_stroke_t_30days = ifelse(ep_stroke_t_3years * avg_days_in_year <= cutt.off.30days.scaled, 
-                                ep_stroke_t_3years * avg_days_in_year, cutt.off.30days.scaled),
-    ep_coronary_t_30days = ifelse(ep_coronary_t_3years * avg_days_in_year <= cutt.off.30days.scaled, 
-                                  ep_coronary_t_3years * avg_days_in_year, cutt.off.30days.scaled),
-    ep_cvdeath_t_30days = ifelse(ep_cvdeath_t_3years * avg_days_in_year <= cutt.off.30days.scaled, 
-                                 ep_cvdeath_t_3years * avg_days_in_year, cutt.off.30days.scaled),
-    ep_major_t_90days = ifelse(ep_major_t_3years * avg_days_in_year <= cutt.off.90days.scaled, 
-                               ep_major_t_3years * avg_days_in_year, cutt.off.90days.scaled),
-    ep_stroke_t_90days = ifelse(ep_stroke_t_3years * avg_days_in_year <= cutt.off.90days.scaled, 
-                                ep_stroke_t_3years * avg_days_in_year, cutt.off.90days.scaled),
-    ep_coronary_t_90days = ifelse(ep_coronary_t_3years * avg_days_in_year <= cutt.off.90days.scaled, 
-                                  ep_coronary_t_3years * avg_days_in_year, cutt.off.90days.scaled),
-    ep_cvdeath_t_90days = ifelse(ep_cvdeath_t_3years * avg_days_in_year <= cutt.off.90days.scaled, 
-                                 ep_cvdeath_t_3years * avg_days_in_year, cutt.off.90days.scaled)
-  ) 
-
 ```
 
 
-```{r Cox-regressions: new times, message=FALSE, warning=FALSE}
-
-attach(AERNASE.clin.targets)
-AERNASE.clin.targets[,"epmajor.30days"] <- AERNASE.clin.targets$epmajor.3years
-AERNASE.clin.targets$epmajor.30days[epmajor.3years == 1 & ep_major_t_3years > cutt.off.30days] <- 0
-
-AERNASE.clin.targets[,"epstroke.30days"] <- AERNASE.clin.targets$epstroke.3years
-AERNASE.clin.targets$epstroke.30days[epstroke.3years == 1 & ep_stroke_t_3years > cutt.off.30days] <- 0
-
-AERNASE.clin.targets[,"epcoronary.30days"] <- AERNASE.clin.targets$epcoronary.3years
-AERNASE.clin.targets$epcoronary.30days[epcoronary.3years == 1 & ep_coronary_t_3years > cutt.off.30days] <- 0
-
-AERNASE.clin.targets[,"epcvdeath.30days"] <- AERNASE.clin.targets$epcvdeath.3years
-AERNASE.clin.targets$epcvdeath.30days[epcvdeath.3years == 1 & ep_cvdeath_t_3years > cutt.off.30days] <- 0
-
-AERNASE.clin.targets[,"epmajor.90days"] <- AERNASE.clin.targets$epmajor.3years
-AERNASE.clin.targets$epmajor.90days[epmajor.3years == 1 & ep_major_t_3years > cutt.off.90days] <- 0
-
-AERNASE.clin.targets[,"epstroke.90days"] <- AERNASE.clin.targets$epstroke.3years
-AERNASE.clin.targets$epstroke.90days[epstroke.3years == 1 & ep_stroke_t_3years > cutt.off.90days] <- 0
-
-AERNASE.clin.targets[,"epcoronary.90days"] <- AERNASE.clin.targets$epcoronary.3years
-AERNASE.clin.targets$epcoronary.90days[epcoronary.3years == 1 & ep_coronary_t_3years > cutt.off.90days] <- 0
-
-AERNASE.clin.targets[,"epcvdeath.90days"] <- AERNASE.clin.targets$epcvdeath.3years
-AERNASE.clin.targets$epcvdeath.90days[epcvdeath.3years == 1 & ep_cvdeath_t_3years > cutt.off.90days] <- 0
-
-detach(AERNASE.clin.targets)
-
-AERNASE.clin.targets.temp <- subset(AERNASE.clin.targets,  select = c("study_number", "Age", "Gender", "Hospital", "Artery_summary", 
-                                      "epmajor.3years", "epstroke.3years", "epcoronary.3years", "epcvdeath.3years",
-                                      "epmajor.30days", "epstroke.30days", "epcoronary.30days", "epcvdeath.30days",
-                                      "epmajor.90days", "epstroke.90days", "epcoronary.90days", "epcvdeath.90days"))
-require(labelled)
-AERNASE.clin.targets.temp$Gender <- to_factor(AERNASE.clin.targets.temp$Gender)
-AERNASE.clin.targets.temp$Hospital <- to_factor(AERNASE.clin.targets.temp$Hospital)
-AERNASE.clin.targets.temp$Artery_summary <- to_factor(AERNASE.clin.targets.temp$Artery_summary)
-
-# DT::datatable(AERNASE.clin.targets.temp[1:10,], caption = "Excerpt of the whole AERNASE.clin.targets.", rownames = FALSE)
-
-rm(AERNASE.clin.targets.temp)
-
-```
 
 ### Sanity checks
 
@@ -1353,11 +1243,15 @@ COX.STAT <- function(coxfit, DATASET, OUTCOME, target_of_interest){
   print(output)
 } 
 
-times = c("ep_major_t_3years", 
-          "ep_stroke_t_3years", "ep_coronary_t_3years", "ep_cvdeath_t_3years")
+# times = c("ep_major_t_3years", 
+#           "ep_stroke_t_3years", "ep_coronary_t_3years", "ep_cvdeath_t_3years")
+# 
+# endpoints = c("epmajor.3years", 
+#               "epstroke.3years", "epcoronary.3years", "epcvdeath.3years")
 
-endpoints = c("epmajor.3years", 
-              "epstroke.3years", "epcoronary.3years", "epcvdeath.3years")
+times = c("ep_major_t_3years")
+
+endpoints = c("epmajor.3years")
 
 cat("* Check the cases per event type - for sanity.")
 for (events in endpoints){
@@ -1382,65 +1276,6 @@ for (eventtime in times){
  print(p)
  ggsave(file = paste0(QC_loc, "/",Today,".AERNASE.clin.targets.EventDistributionPerYear.",eventtime,".pdf"), plot = last_plot())
 }
-
-times30 = c("ep_major_t_30days", 
-          "ep_stroke_t_30days", "ep_coronary_t_30days", "ep_cvdeath_t_30days")
-
-endpoints30 = c("epmajor.30days", 
-              "epstroke.30days", "epcoronary.30days", "epcvdeath.30days")
-
-cat("* Check the cases per event type - for sanity.")
-for (events in endpoints30){
-  print(paste0("Printing the summary of: ",events))
-  # print(summary(AERNASE.clin.targets[,events]))
-  print(table(AERNASE.clin.targets[,events]))
-}
-
-cat("* Check distribution of events over time - for sanity.")
-for (eventtimes in times30){
-  print(paste0("Printing the summary of: ",eventtimes))
-  print(summary(AERNASE.clin.targets[,eventtimes]))
-}
-
-for (eventtime in times30){
-  
-  print(paste0("Printing the distribution of: ",eventtime))
-  p <- gghistogram(AERNASE.clin.targets, x = eventtime, y = "..count..",
-              main = eventtime, bins = 15, 
-              xlab = "days", color = uithof_color[16], fill = uithof_color[16], ggtheme = theme_minimal()) 
- print(p)
- ggsave(file = paste0(QC_loc, "/",Today,".AERNASE.clin.targets.EventDistributionPer30Days.",eventtime,".pdf"), plot = last_plot())
-}
-
-times90 = c("ep_major_t_90days", 
-          "ep_stroke_t_90days", "ep_coronary_t_90days", "ep_cvdeath_t_90days")
-
-endpoints90 = c("epmajor.90days", 
-              "epstroke.90days", "epcoronary.90days", "epcvdeath.90days")
-
-cat("* Check the cases per event type - for sanity.")
-for (events in endpoints90){
-  print(paste0("Printing the summary of: ",events))
-  # print(summary(AERNASE.clin.targets[,events]))
-  print(table(AERNASE.clin.targets[,events]))
-}
-
-cat("* Check distribution of events over time - for sanity.")
-for (eventtimes in times90){
-  print(paste0("Printing the summary of: ",eventtimes))
-  print(summary(AERNASE.clin.targets[,eventtimes]))
-}
-
-for (eventtime in times90){
-  
-  print(paste0("Printing the distribution of: ",eventtime))
-  p <- gghistogram(AERNASE.clin.targets, x = eventtime, y = "..count..",
-              main = eventtime, bins = 15, 
-              xlab = "days", color = uithof_color[16], fill = uithof_color[16], ggtheme = theme_minimal()) 
- print(p)
- ggsave(file = paste0(QC_loc, "/",Today,".AERNASE.clin.targets.EventDistributionPer90Days.",eventtime,".pdf"), plot = last_plot())
-}
-
 
 ```
 
@@ -1692,493 +1527,6 @@ rm(TEMP.DF, target_of_interest, fit, cox, coxplot, COX.results, COX.results.TEMP
 ```
 
 
-#### 30-days follow-up
-
-##### Model 1
-```{r Cox-regression Analysis: Simple model, 30 days}
-# Set up a dataframe to receive results
-COX.results <- data.frame(matrix(NA, ncol = 12, nrow = 0))
-
-# Looping over each target_of_interest/endpoint/time combination
-for (i in 1:length(times30)){
-  eptime = times30[i]
-  ep = endpoints30[i]
-  cat(paste0("* Analyzing the effect of plaque target-of-interest on [",ep,"].\n"))
-  cat(" - creating temporary SE for this work.\n")
-  TEMP.DF = as.data.frame(AERNASE.clin.targets)
-  cat(" - making a 'Surv' object and adding this to temporary dataframe.\n")
-  TEMP.DF$event <- as.integer(TEMP.DF[,ep])
-  TEMP.DF$y <- Surv(time = TEMP.DF[,eptime], event = TEMP.DF$event)
-  cat(" - making strata of each of the plaque target-of-interest and start survival analysis.\n")
-  
-  for (target_of_interest in 1:length(TRAITS.TARGET.RANK)){
-    cat(paste0("   > processing [",TRAITS.TARGET.RANK[target_of_interest],"]; ",target_of_interest," out of ",length(TRAITS.TARGET.RANK)," target-of-interest.\n"))
-    # splitting into two groups
-    TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]] <- cut2(TEMP.DF[,TRAITS.TARGET.RANK[target_of_interest]], g = 2)
-    cat(paste0("   > cross tabulation of ",TRAITS.TARGET.RANK[target_of_interest],"-stratum.\n"))
-    show(table(TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]]))
-    
-    cat(paste0("\n   > fitting the model for ",TRAITS.TARGET.RANK[target_of_interest],"-stratum.\n"))
-    fit <- survfit(as.formula(paste0("y ~ ", TRAITS.TARGET.RANK[target_of_interest])), data = TEMP.DF)
-    
-    cat(paste0("\n   > make a Kaplan-Meier-shizzle...\n"))
-    # make Kaplan-Meier curve and save it
-    show(ggsurvplot(fit, data = TEMP.DF,
-                    palette = c("#DB003F", "#1290D9"),
-                    # palete = c("F59D10", "#DB003F", "#49A01D", "#1290D9"),
-                    linetype = c(1,2),
-                    ylim = c(0.75, 1),
-                    # linetype = c(1,2,3,4),
-                    # conf.int = FALSE, conf.int.fill = "#595A5C", conf.int.alpha = 0.1,
-                    pval = FALSE, pval.method = FALSE, pval.size = 4,
-                    risk.table = TRUE, risk.table.y.text = FALSE, tables.y.text.col = TRUE, fontsize = 4,
-                    censor = FALSE,
-                    legend = "right",
-                    legend.title = paste0("",TRAITS.TARGET.RANK[target_of_interest],""),
-                    legend.labs = c("low", "high"),
-                    title = paste0("Risk of ",ep,""), xlab = "Time [days]", font.main = c(16, "bold", "black")))
-    dev.copy2pdf(file = paste0(COX_loc,"/",
-                               Today,".AERNASE.clin.targets.survival.",ep,".2G.",
-                               TRAITS.TARGET.RANK[target_of_interest],".30days.pdf"), width = 12, height = 10, onefile = FALSE)
-
-    cat(paste0("\n   > perform the Cox-regression fashizzle and plot it...\n"))
-    ### Do Cox-regression and plot it
-    
-    ### MODEL 1 (Simple model)
-    cox = coxph(Surv(TEMP.DF[,eptime], event) ~ TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]]+Age+Gender + ORdate_year, data = TEMP.DF)
-    coxplot = coxph(Surv(TEMP.DF[,eptime], event) ~ strata(TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]])+Age+Gender + ORdate_year, data = TEMP.DF)
-
-    plot(survfit(coxplot), main = paste0("Cox proportional hazard of [",ep,"] per [",eptime,"]."),
-         ylim = c(0.75, 1), xlim = c(0,3), col = c("#595A5C", "#DB003F", "#1290D9"),
-         # ylim = c(0, 1), xlim = c(0,3), col = c("#DB003F", "#1290D9"),
-         lty = c(1,2), lwd = 2,
-         ylab = "Suvival probability", xlab = "FU time [days]",
-         mark.time = FALSE, axes = FALSE, bty = "n")
-    legend("topright",
-           c("low", "high"),
-           title = paste0("",TRAITS.TARGET.RANK[target_of_interest],""),
-           col = c("#DB003F", "#1290D9"),
-           lty = c(1,2), lwd = 2,
-           bty = "n")
-    axis(side = 1, at = seq(0, 3, by = 1))
-    axis(side = 2, at = seq(0, 1, by = 0.2))
-    dev.copy2pdf(file = paste0(COX_loc,"/",
-                               Today,".AERNASE.clin.targets.Cox.",ep,".2G.",
-                               # Today,".AERNASE.clin.targets.Cox.",ep,".4G.",
-                               TRAITS.TARGET.RANK[target_of_interest],".MODEL1.30days.pdf"), height = 12, width = 10, onefile = TRUE)
-    show(summary(cox))
-
-    cat(paste0("\n   > writing the Cox-regression fashizzle to Excel...\n"))
-
-    COX.results.TEMP <- data.frame(matrix(NA, ncol = 12, nrow = 0))
-    COX.results.TEMP[1,] = COX.STAT(cox, "AERNASE.clin.targets", ep, TRAITS.TARGET.RANK[target_of_interest])
-    COX.results = rbind(COX.results, COX.results.TEMP)
-
-  }
-}
-
-cat("- Edit the column names...\n")
-colnames(COX.results) = c("Dataset", "Outcome", "CpG",
-                          "Beta", "s.e.m.",
-                          "HR", "low95CI", "up95CI",
-                          "Z-value", "P-value", "SampleSize", "N_events")
-
-cat("- Correct the variable types...\n")
-COX.results$Beta <- as.numeric(COX.results$Beta)
-COX.results$s.e.m. <- as.numeric(COX.results$s.e.m.)
-COX.results$HR <- as.numeric(COX.results$HR)
-COX.results$low95CI <- as.numeric(COX.results$low95CI)
-COX.results$up95CI <- as.numeric(COX.results$up95CI)
-COX.results$`Z-value` <- as.numeric(COX.results$`Z-value`)
-COX.results$`P-value` <- as.numeric(COX.results$`P-value`)
-COX.results$SampleSize <- as.numeric(COX.results$SampleSize)
-COX.results$N_events <- as.numeric(COX.results$N_events)
-
-AERNASE.clin.targets.COX.results <- COX.results
-
-# Save the data
-library(openxlsx)
-cat("- Writing results to Excel-file...\n")
-head.style <- createStyle(textDecoration = "BOLD")
-write.xlsx(AERNASE.clin.targets.COX.results,
-           file = paste0(OUT_loc, "/",Today,".AERNASE.clin.targets.Cox.2G.MODEL1.30days.xlsx"),
-           creator = "Sander W. van der Laan",
-           sheetName = "Results", headerStyle = head.style,
-           rowNames = FALSE, colnames = TRUE, overwrite = TRUE)
-
-# Removing intermediates
-cat("- Removing intermediate files...\n")
-rm(TEMP.DF, target_of_interest, fit, cox, coxplot, COX.results, COX.results.TEMP, head.style, AERNASE.clin.targets.COX.results)
-
-```
-
-##### Model 2
-```{r Cox-regression Analysis: MODEL 2, 30 days}
-# Set up a dataframe to receive results
-COX.results <- data.frame(matrix(NA, ncol = 12, nrow = 0))
-
-# Looping over each target_of_interest/endpoint/time combination
-for (i in 1:length(times30)){
-  eptime = times30[i]
-  ep = endpoints30[i]
-  cat(paste0("* Analyzing the effect of plaque target-of-interest on [",ep,"].\n"))
-  cat(" - creating temporary SE for this work.\n")
-  TEMP.DF = as.data.frame(AERNASE.clin.targets)
-  cat(" - making a 'Surv' object and adding this to temporary dataframe.\n")
-  TEMP.DF$event <- as.integer(TEMP.DF[,ep])
-  #as.integer(TEMP.DF[,ep] == "Excluded")
-
-  TEMP.DF$y <- Surv(time = TEMP.DF[,eptime], event = TEMP.DF$event)
-  cat(" - making strata of each of the plaque target-of-interest and start survival analysis.\n")
-  
-  for (target_of_interest in 1:length(TRAITS.TARGET.RANK)){
-    cat(paste0("   > processing [",TRAITS.TARGET.RANK[target_of_interest],"]; ",target_of_interest," out of ",length(TRAITS.TARGET.RANK)," target-of-interest.\n"))
-    # splitting into two groups
-    TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]] <- cut2(TEMP.DF[,TRAITS.TARGET.RANK[target_of_interest]], g = 2)
-    cat(paste0("   > cross tabulation of ",TRAITS.TARGET.RANK[target_of_interest],"-stratum.\n"))
-    show(table(TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]]))
-    
-    cat(paste0("\n   > fitting the model for ",TRAITS.TARGET.RANK[target_of_interest],"-stratum.\n"))
-    fit <- survfit(as.formula(paste0("y ~ ", TRAITS.TARGET.RANK[target_of_interest])), data = TEMP.DF)
-    
-    cat(paste0("\n   > make a Kaplan-Meier-shizzle...\n"))
-    # make Kaplan-Meier curve and save it
-    show(ggsurvplot(fit, data = TEMP.DF,
-                    palette = c("#DB003F", "#1290D9"),
-                    # palete = c("F59D10", "#DB003F", "#49A01D", "#1290D9"),
-                    linetype = c(1,2),
-                    ylim = c(0.75, 1),
-                    # linetype = c(1,2,3,4),
-                    # conf.int = FALSE, conf.int.fill = "#595A5C", conf.int.alpha = 0.1,
-                    pval = FALSE, pval.method = FALSE, pval.size = 4,
-                    risk.table = TRUE, risk.table.y.text = FALSE, tables.y.text.col = TRUE, fontsize = 4,
-                    censor = FALSE,
-                    legend = "right",
-                    legend.title = paste0("",TRAITS.TARGET.RANK[target_of_interest],""),
-                    legend.labs = c("low", "high"),
-                    title = paste0("Risk of ",ep,""), xlab = "Time [days]", font.main = c(16, "bold", "black")))
-    dev.copy2pdf(file = paste0(COX_loc,"/",
-                               Today,".AERNASE.clin.targets.survival.",ep,".2G.",
-                               TRAITS.TARGET.RANK[target_of_interest],".30days.pdf"), width = 12, height = 10, onefile = FALSE)
-
-    cat(paste0("\n   > perform the Cox-regression fashizzle and plot it...\n"))
-    ### Do Cox-regression and plot it
-    
-    ### MODEL 2 adjusted for age, sex, hypertension, diabetes, smoking, LDL-C levels, lipid-lowering drugs, antiplatelet drugs, eGFR, BMI, history of CVD, level of stenosis
-    cox = coxph(Surv(TEMP.DF[,eptime], event) ~ TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]]+Age + Gender + ORdate_year + Hypertension.composite + DiabetesStatus + SmokerStatus + Med.Statin.LLD + Med.all.antiplatelet + GFR_MDRD + BMI + MedHx_CVD + stenose, data = TEMP.DF)
-    coxplot = coxph(Surv(TEMP.DF[,eptime], event) ~ strata(TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]])+Age + Gender + ORdate_year + Hypertension.composite + DiabetesStatus + SmokerStatus + Med.Statin.LLD + Med.all.antiplatelet + GFR_MDRD + BMI + MedHx_CVD + stenose, data = TEMP.DF)
-
-  
-    plot(survfit(coxplot), main = paste0("Cox proportional hazard of [",ep,"] per [",eptime,"]."),
-         ylim = c(0.75, 1), xlim = c(0,3), col = c("#DB003F", "#1290D9"),
-         # ylim = c(0, 1), xlim = c(0,3), col = c("#DB003F", "#1290D9"),
-         lty = c(1,2), lwd = 2,
-         ylab = "Suvival probability", xlab = "FU time [days]",
-         mark.time = FALSE, axes = FALSE, bty = "n")
-    legend("topright",
-           c("low", "high"),
-           title = paste0("",TRAITS.TARGET.RANK[target_of_interest],""),
-           col = c("#DB003F", "#1290D9"),
-           lty = c(1,2), lwd = 2,
-           bty = "n")
-    axis(side = 1, at = seq(0, 3, by = 1))
-    axis(side = 2, at = seq(0, 1, by = 0.2))
-    dev.copy2pdf(file = paste0(COX_loc,"/",
-                               Today,".AERNASE.clin.targets.Cox.",ep,".2G.",
-                               # Today,".AERNASE.clin.targets.Cox.",ep,".4G.",
-                               TRAITS.TARGET.RANK[target_of_interest],".MODEL2.30days.pdf"), height = 12, width = 10, onefile = TRUE)
-
-    show(summary(cox))
-
-    cat(paste0("\n   > writing the Cox-regression fashizzle to Excel...\n"))
-
-    COX.results.TEMP <- data.frame(matrix(NA, ncol = 12, nrow = 0))
-    COX.results.TEMP[1,] = COX.STAT(cox, "AERNASE.clin.targets", ep, TRAITS.TARGET.RANK[target_of_interest])
-    COX.results = rbind(COX.results, COX.results.TEMP)
-
-  }
-}
-
-cat("- Edit the column names...\n")
-colnames(COX.results) = c("Dataset", "Outcome", "CpG",
-                          "Beta", "s.e.m.",
-                          "HR", "low95CI", "up95CI",
-                          "Z-value", "P-value", "SampleSize", "N_events")
-
-cat("- Correct the variable types...\n")
-COX.results$Beta <- as.numeric(COX.results$Beta)
-COX.results$s.e.m. <- as.numeric(COX.results$s.e.m.)
-COX.results$HR <- as.numeric(COX.results$HR)
-COX.results$low95CI <- as.numeric(COX.results$low95CI)
-COX.results$up95CI <- as.numeric(COX.results$up95CI)
-COX.results$`Z-value` <- as.numeric(COX.results$`Z-value`)
-COX.results$`P-value` <- as.numeric(COX.results$`P-value`)
-COX.results$SampleSize <- as.numeric(COX.results$SampleSize)
-COX.results$N_events <- as.numeric(COX.results$N_events)
-
-AERNASE.clin.targets.COX.results <- COX.results
-
-# Save the data
-cat("- Writing results to Excel-file...\n")
-head.style <- createStyle(textDecoration = "BOLD")
-
-write.xlsx(AERNASE.clin.targets.COX.results,
-           file = paste0(OUT_loc, "/",Today,".AERNASE.clin.targets.Cox.2G.MODEL2.30days.xlsx"),
-           creator = "Sander W. van der Laan",
-           sheetName = "Results", headerStyle = head.style,
-           rowNames = FALSE, colNames = TRUE, overwrite = TRUE)
-
-# Removing intermediates
-cat("- Removing intermediate files...\n")
-rm(TEMP.DF, target_of_interest, fit, cox, coxplot, COX.results, COX.results.TEMP, head.style, AERNASE.clin.targets.COX.results)
-
-
-```
-
-
-#### 90-days follow-up
-
-##### Model 1 
-```{r Cox-regression Analysis: Simple model, 90 days}
-# Set up a dataframe to receive results
-COX.results <- data.frame(matrix(NA, ncol = 12, nrow = 0))
-
-# Looping over each target_of_interest/endpoint/time combination
-for (i in 1:length(times90)){
-  eptime = times90[i]
-  ep = endpoints90[i]
-  cat(paste0("* Analyzing the effect of plaque target-of-interest on [",ep,"].\n"))
-  cat(" - creating temporary SE for this work.\n")
-  TEMP.DF = as.data.frame(AERNASE.clin.targets)
-  cat(" - making a 'Surv' object and adding this to temporary dataframe.\n")
-  TEMP.DF$event <- as.integer(TEMP.DF[,ep])
-  TEMP.DF$y <- Surv(time = TEMP.DF[,eptime], event = TEMP.DF$event)
-  cat(" - making strata of each of the plaque target-of-interest and start survival analysis.\n")
-  
-  for (target_of_interest in 1:length(TRAITS.TARGET.RANK)){
-    cat(paste0("   > processing [",TRAITS.TARGET.RANK[target_of_interest],"]; ",target_of_interest," out of ",length(TRAITS.TARGET.RANK)," target-of-interest.\n"))
-    # splitting into two groups
-    TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]] <- cut2(TEMP.DF[,TRAITS.TARGET.RANK[target_of_interest]], g = 2)
-    cat(paste0("   > cross tabulation of ",TRAITS.TARGET.RANK[target_of_interest],"-stratum.\n"))
-    show(table(TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]]))
-    
-    cat(paste0("\n   > fitting the model for ",TRAITS.TARGET.RANK[target_of_interest],"-stratum.\n"))
-    fit <- survfit(as.formula(paste0("y ~ ", TRAITS.TARGET.RANK[target_of_interest])), data = TEMP.DF)
-    
-    cat(paste0("\n   > make a Kaplan-Meier-shizzle...\n"))
-    # make Kaplan-Meier curve and save it
-    show(ggsurvplot(fit, data = TEMP.DF,
-                    palette = c("#DB003F", "#1290D9"),
-                    # palete = c("F59D10", "#DB003F", "#49A01D", "#1290D9"),
-                    linetype = c(1,2),
-                    ylim = c(0.75, 1),
-                    # linetype = c(1,2,3,4),
-                    # conf.int = FALSE, conf.int.fill = "#595A5C", conf.int.alpha = 0.1,
-                    pval = FALSE, pval.method = FALSE, pval.size = 4,
-                    risk.table = TRUE, risk.table.y.text = FALSE, tables.y.text.col = TRUE, fontsize = 4,
-                    censor = FALSE,
-                    legend = "right",
-                    legend.title = paste0("",TRAITS.TARGET.RANK[target_of_interest],""),
-                    legend.labs = c("low", "high"),
-                    title = paste0("Risk of ",ep,""), xlab = "Time [days]", font.main = c(16, "bold", "black")))
-    dev.copy2pdf(file = paste0(COX_loc,"/",
-                               Today,".AERNASE.clin.targets.survival.",ep,".2G.",
-                               TRAITS.TARGET.RANK[target_of_interest],".90days.pdf"), width = 12, height = 10, onefile = FALSE)
-
-    cat(paste0("\n   > perform the Cox-regression fashizzle and plot it...\n"))
-    ### Do Cox-regression and plot it
-    
-    ### MODEL 1 (Simple model)
-    cox = coxph(Surv(TEMP.DF[,eptime], event) ~ TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]]+Age+Gender + ORdate_year, data = TEMP.DF)
-    coxplot = coxph(Surv(TEMP.DF[,eptime], event) ~ strata(TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]])+Age+Gender + ORdate_year, data = TEMP.DF)
-
-    plot(survfit(coxplot), main = paste0("Cox proportional hazard of [",ep,"] per [",eptime,"]."),
-         ylim = c(0.75, 1), xlim = c(0,3), col = c("#595A5C", "#DB003F", "#1290D9"),
-         # ylim = c(0, 1), xlim = c(0,3), col = c("#DB003F", "#1290D9"),
-         lty = c(1,2), lwd = 2,
-         ylab = "Suvival probability", xlab = "FU time [days]",
-         mark.time = FALSE, axes = FALSE, bty = "n")
-    legend("topright",
-           c("low", "high"),
-           title = paste0("",TRAITS.TARGET.RANK[target_of_interest],""),
-           col = c("#DB003F", "#1290D9"),
-           lty = c(1,2), lwd = 2,
-           bty = "n")
-    axis(side = 1, at = seq(0, 3, by = 1))
-    axis(side = 2, at = seq(0, 1, by = 0.2))
-    dev.copy2pdf(file = paste0(COX_loc,"/",
-                               Today,".AERNASE.clin.targets.Cox.",ep,".2G.",
-                               # Today,".AERNASE.clin.targets.Cox.",ep,".4G.",
-                               TRAITS.TARGET.RANK[target_of_interest],".MODEL1.90days.pdf"), height = 12, width = 10, onefile = TRUE)
-    show(summary(cox))
-
-    cat(paste0("\n   > writing the Cox-regression fashizzle to Excel...\n"))
-
-    COX.results.TEMP <- data.frame(matrix(NA, ncol = 12, nrow = 0))
-    COX.results.TEMP[1,] = COX.STAT(cox, "AERNASE.clin.targets", ep, TRAITS.TARGET.RANK[target_of_interest])
-    COX.results = rbind(COX.results, COX.results.TEMP)
-
-  }
-}
-
-cat("- Edit the column names...\n")
-colnames(COX.results) = c("Dataset", "Outcome", "CpG",
-                          "Beta", "s.e.m.",
-                          "HR", "low95CI", "up95CI",
-                          "Z-value", "P-value", "SampleSize", "N_events")
-
-cat("- Correct the variable types...\n")
-COX.results$Beta <- as.numeric(COX.results$Beta)
-COX.results$s.e.m. <- as.numeric(COX.results$s.e.m.)
-COX.results$HR <- as.numeric(COX.results$HR)
-COX.results$low95CI <- as.numeric(COX.results$low95CI)
-COX.results$up95CI <- as.numeric(COX.results$up95CI)
-COX.results$`Z-value` <- as.numeric(COX.results$`Z-value`)
-COX.results$`P-value` <- as.numeric(COX.results$`P-value`)
-COX.results$SampleSize <- as.numeric(COX.results$SampleSize)
-COX.results$N_events <- as.numeric(COX.results$N_events)
-
-AERNASE.clin.targets.COX.results <- COX.results
-
-# Save the data
-library(openxlsx)
-cat("- Writing results to Excel-file...\n")
-head.style <- createStyle(textDecoration = "BOLD")
-write.xlsx(AERNASE.clin.targets.COX.results,
-           file = paste0(OUT_loc, "/",Today,".AERNASE.clin.targets.Cox.2G.MODEL1.90days.xlsx"),
-           creator = "Sander W. van der Laan",
-           sheetName = "Results", headerStyle = head.style,
-           rowNames = FALSE, colNames = TRUE, overwrite = TRUE)
-
-# Removing intermediates
-cat("- Removing intermediate files...\n")
-rm(TEMP.DF, target_of_interest, fit, cox, coxplot, COX.results, COX.results.TEMP, head.style, AERNASE.clin.targets.COX.results)
-
-```
-
-##### Model 2
-```{r Cox-regression Analysis: MODEL 2, 90 days}
-# Set up a dataframe to receive results
-COX.results <- data.frame(matrix(NA, ncol = 12, nrow = 0))
-
-# Looping over each target_of_interest/endpoint/time combination
-for (i in 1:length(times90)){
-  eptime = times90[i]
-  ep = endpoints90[i]
-  cat(paste0("* Analyzing the effect of plaque target-of-interest on [",ep,"].\n"))
-  cat(" - creating temporary SE for this work.\n")
-  TEMP.DF = as.data.frame(AERNASE.clin.targets)
-  cat(" - making a 'Surv' object and adding this to temporary dataframe.\n")
-  TEMP.DF$event <- as.integer(TEMP.DF[,ep])
-  #as.integer(TEMP.DF[,ep] == "Excluded")
-
-  TEMP.DF$y <- Surv(time = TEMP.DF[,eptime], event = TEMP.DF$event)
-  cat(" - making strata of each of the plaque target-of-interest and start survival analysis.\n")
-  
-  for (target_of_interest in 1:length(TRAITS.TARGET.RANK)){
-    cat(paste0("   > processing [",TRAITS.TARGET.RANK[target_of_interest],"]; ",target_of_interest," out of ",length(TRAITS.TARGET.RANK)," target-of-interest.\n"))
-    # splitting into two groups
-    TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]] <- cut2(TEMP.DF[,TRAITS.TARGET.RANK[target_of_interest]], g = 2)
-    cat(paste0("   > cross tabulation of ",TRAITS.TARGET.RANK[target_of_interest],"-stratum.\n"))
-    show(table(TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]]))
-    
-    cat(paste0("\n   > fitting the model for ",TRAITS.TARGET.RANK[target_of_interest],"-stratum.\n"))
-    fit <- survfit(as.formula(paste0("y ~ ", TRAITS.TARGET.RANK[target_of_interest])), data = TEMP.DF)
-    
-    cat(paste0("\n   > make a Kaplan-Meier-shizzle...\n"))
-    # make Kaplan-Meier curve and save it
-    show(ggsurvplot(fit, data = TEMP.DF,
-                    palette = c("#DB003F", "#1290D9"),
-                    # palete = c("F59D10", "#DB003F", "#49A01D", "#1290D9"),
-                    linetype = c(1,2),
-                    ylim = c(0.75, 1),
-                    # linetype = c(1,2,3,4),
-                    # conf.int = FALSE, conf.int.fill = "#595A5C", conf.int.alpha = 0.1,
-                    pval = FALSE, pval.method = FALSE, pval.size = 4,
-                    risk.table = TRUE, risk.table.y.text = FALSE, tables.y.text.col = TRUE, fontsize = 4,
-                    censor = FALSE,
-                    legend = "right",
-                    legend.title = paste0("",TRAITS.TARGET.RANK[target_of_interest],""),
-                    legend.labs = c("low", "high"),
-                    title = paste0("Risk of ",ep,""), xlab = "Time [days]", font.main = c(16, "bold", "black")))
-    dev.copy2pdf(file = paste0(COX_loc,"/",
-                               Today,".AERNASE.clin.targets.survival.",ep,".2G.",
-                               TRAITS.TARGET.RANK[target_of_interest],".90days.pdf"), width = 12, height = 10, onefile = FALSE)
-
-    cat(paste0("\n   > perform the Cox-regression fashizzle and plot it...\n"))
-    ### Do Cox-regression and plot it
-    
-    ### MODEL 2 adjusted for age, sex, hypertension, diabetes, smoking, LDL-C levels, lipid-lowering drugs, antiplatelet drugs, eGFR, BMI, history of CVD, level of stenosis
-    cox = coxph(Surv(TEMP.DF[,eptime], event) ~ TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]]+Age + Gender + ORdate_year + Hypertension.composite + DiabetesStatus + SmokerStatus + Med.Statin.LLD + Med.all.antiplatelet + GFR_MDRD + BMI + MedHx_CVD + stenose, data = TEMP.DF)
-    coxplot = coxph(Surv(TEMP.DF[,eptime], event) ~ strata(TEMP.DF[[ TRAITS.TARGET.RANK[target_of_interest] ]])+Age + Gender + ORdate_year + Hypertension.composite + DiabetesStatus + SmokerStatus + Med.Statin.LLD + Med.all.antiplatelet + GFR_MDRD + BMI + MedHx_CVD + stenose, data = TEMP.DF)
-
-  
-    plot(survfit(coxplot), main = paste0("Cox proportional hazard of [",ep,"] per [",eptime,"]."),
-         ylim = c(0.75, 1), xlim = c(0,3), col = c("#DB003F", "#1290D9"),
-         # ylim = c(0, 1), xlim = c(0,3), col = c("#DB003F", "#1290D9"),
-         lty = c(1,2), lwd = 2,
-         ylab = "Suvival probability", xlab = "FU time [days]",
-         mark.time = FALSE, axes = FALSE, bty = "n")
-    legend("topright",
-           c("low", "high"),
-           title = paste0("",TRAITS.TARGET.RANK[target_of_interest],""),
-           col = c("#DB003F", "#1290D9"),
-           lty = c(1,2), lwd = 2,
-           bty = "n")
-    axis(side = 1, at = seq(0, 3, by = 1))
-    axis(side = 2, at = seq(0, 1, by = 0.2))
-    dev.copy2pdf(file = paste0(COX_loc,"/",
-                               Today,".AERNASE.clin.targets.Cox.",ep,".2G.",
-                               # Today,".AERNASE.clin.targets.Cox.",ep,".4G.",
-                               TRAITS.TARGET.RANK[target_of_interest],".MODEL2.90days.pdf"), height = 12, width = 10, onefile = TRUE)
-
-    show(summary(cox))
-
-    cat(paste0("\n   > writing the Cox-regression fashizzle to Excel...\n"))
-
-    COX.results.TEMP <- data.frame(matrix(NA, ncol = 12, nrow = 0))
-    COX.results.TEMP[1,] = COX.STAT(cox, "AERNASE.clin.targets", ep, TRAITS.TARGET.RANK[target_of_interest])
-    COX.results = rbind(COX.results, COX.results.TEMP)
-
-  }
-}
-
-cat("- Edit the column names...\n")
-colnames(COX.results) = c("Dataset", "Outcome", "CpG",
-                          "Beta", "s.e.m.",
-                          "HR", "low95CI", "up95CI",
-                          "Z-value", "P-value", "SampleSize", "N_events")
-
-cat("- Correct the variable types...\n")
-COX.results$Beta <- as.numeric(COX.results$Beta)
-COX.results$s.e.m. <- as.numeric(COX.results$s.e.m.)
-COX.results$HR <- as.numeric(COX.results$HR)
-COX.results$low95CI <- as.numeric(COX.results$low95CI)
-COX.results$up95CI <- as.numeric(COX.results$up95CI)
-COX.results$`Z-value` <- as.numeric(COX.results$`Z-value`)
-COX.results$`P-value` <- as.numeric(COX.results$`P-value`)
-COX.results$SampleSize <- as.numeric(COX.results$SampleSize)
-COX.results$N_events <- as.numeric(COX.results$N_events)
-
-AERNASE.clin.targets.COX.results <- COX.results
-
-# Save the data
-cat("- Writing results to Excel-file...\n")
-head.style <- createStyle(textDecoration = "BOLD")
-write.xlsx(AERNASE.clin.targets.COX.results,
-           file = paste0(OUT_loc, "/",Today,".AERNASE.clin.targets.Cox.2G.MODEL2.90days.xlsx"),
-           creator = "Sander W. van der Laan",
-           sheetName = "Results", headerStyle = head.style,
-           rowNames = FALSE, colNames = TRUE, overwrite = TRUE)
-
-# Removing intermediates
-cat("- Removing intermediate files...\n")
-rm(TEMP.DF, target_of_interest, fit, cox, coxplot, COX.results, COX.results.TEMP, head.style, AERNASE.clin.targets.COX.results)
-
-
-```
-
-
 # Correlations
 We correlated plaque levels of the biomarkers.
 
@@ -2220,6 +1568,7 @@ rm(AERNASE.clin.targets.temp)
 
 ```
 
+
 ```{r CrossSampleType Correlations}
 corr_biomarkers.rank <- round(cor(AERNASE.clin.targets.matrix.RANK, 
                              use = "pairwise.complete.obs", #the correlation or covariance between each pair of variables is computed using all complete pairs of observations on those variables
@@ -2228,6 +1577,7 @@ corr_biomarkers.rank
 
 corr_biomarkers_p.rank <- ggcorrplot::cor_pmat(AERNASE.clin.targets.matrix.RANK, use = "pairwise.complete.obs", method = "spearman", exact = FALSE)
 ```
+
 
 ```{r}
 # Add correlation coefficients
@@ -2252,6 +1602,7 @@ dev.off()
 
 ```
 
+
 ```{r Correlations table}
 library(data.table)
 # flattenCorrMatrix
@@ -2272,6 +1623,7 @@ corr_biomarkers.rank.df <- as.data.table(flattenCorrMatrix(corr_biomarkers.rank,
 DT::datatable(corr_biomarkers.rank.df)
 
 ```
+
 
 ```{r Correlations alternative visual 1, message=FALSE, warning=FALSE}
 
@@ -2376,7 +1728,7 @@ saveRDS(AERNASE.targets.genedata, file = paste0(OUT_loc, "/", Today, ".",TRAIT_O
 --------------------------------------------------------------------------------
 
     Version:      v1.2.2
-    Last update:  2024-01-09
+    Last update:  2024-10-18
     Written by:   Sander W. van der Laan (s.w.vanderlaan-2[at]umcutrecht.nl).
     Description:  Script to analyse targets from the Ather-Express Biobank Study.
     Minimum requirements: R version 3.5.2 (2018-12-20) -- 'Eggshell Igloo', macOS Mojave (10.14.2).
