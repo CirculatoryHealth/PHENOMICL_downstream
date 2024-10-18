@@ -1612,7 +1612,7 @@ openxlsx::write.xlsx(CONVOCALS.samplelist.SMA,
 ------------------------------------------------------------------------------------------------------------------------
 
     Version:      v1.0.9
-    Last update:  2024-10-07
+    Last update:  2024-10-17
     Written by:   Sander W. van der Laan (s.w.vanderlaan-2[at]umcutrecht.nl).
     Description:  Script to get some Athero-Express Biobank Study baseline characteristics.
     Minimum requirements: R version 4.3.1 (2023-06-16) -- "Beagle Scouts", Mac OS X Sonoma (14.0, beta 5, 23A5312d)

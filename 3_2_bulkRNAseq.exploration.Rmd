@@ -493,7 +493,6 @@ for(GENE in gene_list_qc){
 **Figure 3: comparing expression of genes of interest to mean expression of a sample of 1,000 random genes**
 
 ```{r boxplots_expression_comparison, message=FALSE, warning=FALSE}
-
 expression_wide <- expression_long %>%
   tidyr::unite("symbol_ensembl", symbol:gene_ensembl, remove = TRUE, sep = "_") %>%
   # dplyr::select(-gene_ensembl, -symbol) %>%
@@ -501,7 +500,7 @@ expression_wide <- expression_long %>%
 
 ```
 
-```{r }
+```{r}
 # the next 3 lines of code gave an error when selecting for genes_interest, since one of the genes of interest is missing: FGF3 is not in the data set. So, we need to select for the other 15 genes.
 
 temp <- expression_long %>%
@@ -517,18 +516,23 @@ symbol_ensembl_gene_list_qc <- temp[temp$symbol %in% gene_list_qc,]$symbol_ensem
 ```{r}
 expression_wide2 <- expression_wide %>%
   left_join(expression_data_sample_mean, by = "study_number") %>%
-  dplyr::select(study_number, Gender, StudyName, symbol_ensembl_gene_list_qc, expression_value_sample)
+  dplyr::select(study_number, StudyName, Gender, symbol_ensembl_gene_list_qc, expression_value_sample)
 
 expression_long2 <- expression_wide2 %>%
   gather(gene, expression_value, -study_number, -StudyName, -Gender) %>%
-  mutate(gene = str_replace_all(gene, c("expression_value_sample" = "Random genes"))) #%>%
-  # mutate(gene = factor(gene, levels = c("Random genes", gene_list_qc)))
+  mutate(gene = str_replace_all(gene, c("expression_value_sample" = "Random genes"))) %>%
+  tidyr::separate(gene, c("gene", "symbol_ensembl"), remove = FALSE, sep = "_") %>%
+  dplyr::select(-symbol_ensembl) %>%
+  dplyr::mutate(gene = factor(gene, levels = c("Random genes", gene_list_qc)))
 expression_long2
 mean_1000_genes <- mean(expression_data_sample_mean$expression_value_sample)
 # head(expression_long2)
-# 
+#
+```
 
-  p1 <- ggpubr::ggboxplot(expression_long2,
+
+```{r}
+p1 <- ggpubr::ggboxplot(expression_long2,
                           x = "gene",
                           y = "expression_value",
                           color = uithof_color[16],
@@ -546,8 +550,11 @@ mean_1000_genes <- mean(expression_data_sample_mean$expression_value_sample)
   ggsave(filename = paste0(PLOT_loc, "/", Today, ".TargetExpression_vs_1000genes.png"), plot = last_plot())
   ggsave(filename = paste0(PLOT_loc, "/", Today, ".TargetExpression_vs_1000genes.pdf"), plot = last_plot())
   ggsave(filename = paste0(PLOT_loc, "/", Today, ".TargetExpression_vs_1000genes.ps"), plot = last_plot())
-  
-  p2 <- ggpubr::ggboxplot(expression_long2,
+```
+
+
+```{r}
+p2 <- ggpubr::ggboxplot(expression_long2,
                           x = "gene",
                           y = "expression_value",
                           color = "StudyName",
@@ -567,8 +574,7 @@ mean_1000_genes <- mean(expression_data_sample_mean$expression_value_sample)
   ggsave(filename = paste0(PLOT_loc, "/", Today, ".TargetExpression_vs_1000genes_by_AERNAStudy.pdf"), plot = last_plot())
   ggsave(filename = paste0(PLOT_loc, "/", Today, ".TargetExpression_vs_1000genes_by_AERNAStudy.ps"), plot = last_plot())
   
-  rm(p1, p2)
-
+  rm(p1, p2, temp )
 
 ```
 
@@ -593,7 +599,7 @@ p3 <- ggpubr::ggboxplot(expression_long2,
   ggsave(filename = paste0(PLOT_loc, "/", Today, ".TargetExpression_vs_1000genes_by_Gender.pdf"), plot = last_plot())
   ggsave(filename = paste0(PLOT_loc, "/", Today, ".TargetExpression_vs_1000genes_by_Gender.ps"), plot = last_plot())
   
-  rm(p3, temp )
+  rm(p3)
 ```
 
 List all the `gene` for all unique genes where their mean expression is higher than the mean of the 1,000 random genes (`mean_1000_genes`).
@@ -659,8 +665,7 @@ addWorksheet(wb, "Significant Genes")
 writeData(wb, "Significant Genes", expression_long2_mean_gender_t_test_results)
 
 # Save the workbook to an Excel file
-saveWorkbook(wb, paste0(OUT_loc, "/", Today,".iph_area_vst_dgea_gender_significant_genes.xlsx"), overwrite = TRUE)
-
+saveWorkbook(wb, paste0(OUT_loc, "/", Today,".iph_area_075_vst_dgea_gender_significant_genes.xlsx"), overwrite = TRUE)
 
 ```
 
@@ -681,8 +686,52 @@ temp <- expression_wide %>%
   drop_na() %>% # drop NA 
   Filter(function(x) sd(x) != 0, .) # filter variables with sd = 0
 
-temp.cor <- cor(temp, method = "spearman") 
+# average out columns that start with the same gene symbol, where the gene symbol is the first part of the column name separated by '_'; rename the columns to the part before '_'
+# Load necessary library
+library(dplyr)
 
+# Assume your data frame is named `expression_wide`
+
+# Step 1: Identify the columns that correspond to gene symbols using regex
+gene_columns <- grep("ENSG\\d+", colnames(temp), value = TRUE)
+
+# Step 2: Extract gene symbols using regular expression
+# Extract everything before the underscore (_) as the gene symbol
+gene_symbols <- sub("(_ENSG\\d+)", "", gene_columns)
+
+# Step 3: Create a list of unique gene symbols
+unique_genes <- unique(gene_symbols)
+
+# Step 4: For each unique gene, either average the columns (if multiple) or rename (if single)
+temp2 <- temp
+
+for (gene in unique_genes) {
+  # Find all columns that match the gene symbol
+  gene_cols <- grep(paste0("^", gene, "_ENSG\\d+"), colnames(temp2), value = TRUE)
+  
+  if (length(gene_cols) > 1) {
+    # If multiple columns for the gene, compute the row-wise average
+    temp2[[gene]] <- rowMeans(temp2[gene_cols], na.rm = TRUE)
+    # Remove the original ENSG columns after averaging
+    temp2 <- temp2 %>% dplyr::select(-all_of(gene_cols))
+  } else if (length(gene_cols) == 1) {
+    # If only one column for the gene, just rename it by removing the ENSG part
+    colnames(temp2)[colnames(temp2) == gene_cols] <- gene
+  }
+}
+
+# View the result
+print(temp2)
+
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+temp.cor <- cor(temp2, method = "spearman")
+```
+
+
+```{r, message=FALSE, warning=FALSE}
 p1 <- pheatmap(data.matrix(temp.cor), 
                scale = "none",
                cluster_rows = TRUE, 
@@ -696,7 +745,7 @@ ggsave(filename = paste0(PLOT_loc, "/", Today, ".correlations.gene_list.pdf"), p
 ggsave(filename = paste0(PLOT_loc, "/", Today, ".correlations.gene_list.png"), plot = p1, height = 15, width = 15)
 
 
-rm(temp, temp.cor, p1)
+rm(temp, temp2, temp.cor, p1)
 
 ```
 
@@ -818,7 +867,6 @@ rm(temp)
 
 The subset as `SummarizedExperiment()` dataset in `RDS`-format.
 ```{r}
-
 # saveRDS(AERNASE, file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE_target.CEA.608pts.SE.after_qc.IC_commercial.RDS"))
 saveRDS(AERNAScomboSE_target, file = paste0(OUT_loc, "/", Today, ".AERNAScomboSE_target.CEA.1092pts.SE.after_qc.IC_academic.RDS"))
 
@@ -839,13 +887,25 @@ ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAScomboSE_target), AERNAScomboS
                     ggtheme = theme_pubclean())
 ```
 
+```{r}
+ggpubr::gghistogram(as.tibble(t(subset(assay(AERNAScomboSE_target), AERNAScomboSE_target@rowRanges$symbol == "SORBS2"))),
+                    x = "ENSG00000154556", 
+                    xlab = "SORBS2 (ENSG00000154556) expression\nlog-transformed, size corrected counts",
+                    color = "white", fill =  uithof_color[16],
+                    rug = F, add_density = F,
+                    add = c("median"),
+                    add.params = list(color = uithof_color[3]), 
+                    ggtheme = theme_pubclean())
+```
+
+
 
 # Session information
 
 --------------------------------------------------------------------------------
 
     Version:      v1.1.0
-    Last update:  2024-10-07
+    Last update:  2024-10-17
     Written by:   Sander W. van der Laan (s.w.vanderlaan-2[at]umcutrecht.nl).
     Description:  Script to load bulk RNA sequencing data, and perform gene expression analyses, and visualisations.
     Minimum requirements: R version 3.5.2 (2018-12-20) -- 'Eggshell Igloo', macOS Mojave (10.14.2).

@@ -464,14 +464,18 @@ target_genes
 ```
 
 
-This code is just an example to filter the list from genes that are not in the data.
+This is to filter the list from genes that are not in the data.
 
-- _COL3A_ ==> not found
-- _COL2A_ ==> not found
+- _ND6_ ==> _MTND6_, not found
+- _TRIM49D1_ ==> _TRIM49DP_, not found
+- _ND4L_ ==> _MTND4L_, not found
+- _ATP8_ ==> _MTATP8_, not found
+- _RNASE1_ ==> _RNS1_, not found
+
 
 ```{r Visualisation: preparation}
 
-gene_list_rm <- c("COL3A", "COL2A") 
+gene_list_rm <- c("ND6", "TRIM49D1", "ND4L", "ATP8", "RNASE1")
 
 temp = target_genes[!target_genes %in% gene_list_rm]
 
@@ -496,7 +500,7 @@ library(RColorBrewer)
 p1 <- DotPlot(scRNAseqData, features = target_genes_qc,
         cols = "RdBu")
 
-p1 + theme(axis.text.x = element_text(angle = 45, hjust=1, size = 5))
+p1 + theme(axis.text.x = element_text(angle = 45, hjust=1, size = 10))
 
 ggsave(paste0(PLOT_loc, "/", Today, ".DotPlot.Targets.png"), plot = last_plot())
 ggsave(paste0(PLOT_loc, "/", Today, ".DotPlot.Targets.ps"), plot = last_plot())
@@ -511,8 +515,40 @@ rm(p1)
 # ggsave(paste0(PLOT_loc, "/", Today, ".FeaturePlot.Targets.png"), plot = last_plot())
 # ggsave(paste0(PLOT_loc, "/", Today, ".FeaturePlot.Targets.ps"), plot = last_plot())
 
+```
+
+Let's group this dotplot based on up- and down-regulation. First, we filter the target list for up- and down-regulated genes.
+
+```{r}
+# Assuming 'gene_info' is your data.frame with the relevant columns loaded
+gene_list_df_filtered <- subset(gene_list_df, Comments == "UP" | Comments == "DOWN")
+```
+
+```{r}
+# Separate genes by significance
+up_genes <- gene_list_df_filtered$GeneSymbol[gene_list_df_filtered$significance == "UP"]
+down_genes <- gene_list_df_filtered$GeneSymbol[gene_list_df_filtered$significance == "DOWN"]
+
+# Combine the genes, first DOWN then UP (or vice versa based on preference)
+ordered_genes_qc <- c(down_genes, up_genes)
+```
+
+```{r}
+library(RColorBrewer)
+# Create DotPlot grouped by 'significance_group'
+p1 <- DotPlot(scRNAseqData, 
+              features = ordered_genes_qc, 
+              cols = "RdBu")
+
+p1 + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10))
+
+# Save the plots
+ggsave(paste0(PLOT_loc, "/", Today, ".DotPlot.Targets.SignificanceGrouped.png"), plot = p1)
+ggsave(paste0(PLOT_loc, "/", Today, ".DotPlot.Targets.SignificanceGrouped.ps"), plot = p1)
+ggsave(paste0(PLOT_loc, "/", Today, ".DotPlot.Targets.SignificanceGrouped.pdf"), plot = p1)
 
 ```
+
 
 ```{r Visualisation: Targets}
 # VlnPlot(scRNAseqData, features = "DUSP27")
@@ -540,7 +576,6 @@ for (GENE in target_genes_qc){
   # print(vp1)
   
 }
-
 ```
 
 ### Differential expression between cell communities
