@@ -1,6 +1,6 @@
 ---
 title: "Additional Figures"
-subtitle: Accompanying 'AE_TEMPLATE'
+subtitle: Accompanying 'CONVOCALS_downstream'
 author: '[Sander W. van der Laan, PhD](https://vanderlaanand.science) | s.w.vanderlaan[at]gmail[dot]com'
 date: '`r Sys.Date()`'
 output:
@@ -84,7 +84,7 @@ This notebook contains additional figures of the project.
 
 ```{r Loading project data}
 load(paste0(PROJECT_loc, "/",Today,".",PROJECTNAME,".bulkRNAseq.main_analysis.RData"))
-# load(paste0(PROJECT_loc, "/20240109.",PROJECTNAME,".bulkRNAseq.main_analysis.RData"))
+# load(paste0(PROJECT_loc, "/20241017.",PROJECTNAME,".bulkRNAseq.main_analysis.RData"))
 ```
 
 
@@ -113,17 +113,17 @@ We want to create per-age-group figures median ± interquartile range.
 ```{r per Sex}
 
 # ?ggpubr::ggboxplot()
-compare_means(PCSK9 ~ Gender,  data = AERNASE.clin, method = "kruskal.test")
+compare_means(HMOX1 ~ Gender,  data = AERNASE.clin, method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin, 
                   x = c("Gender"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "gender",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Gender), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.Gender.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.Gender.pdf"), plot = last_plot())
 
 
 ```
@@ -158,31 +158,31 @@ Now we can draw some graphs of plaque `r TRAIT_OF_INTEREST` levels per sex and a
 ```{r per AgeGroup per Sex}
 
 # ?ggpubr::ggboxplot()
-compare_means(PCSK9 ~ AgeGroup,  data = AERNASE.clin, method = "kruskal.test")
+compare_means(HMOX1 ~ AgeGroup,  data = AERNASE.clin, method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin, 
                   x = c("AgeGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Age groups (years)",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "AgeGroup",
                   palette = "npg",
                   # add = "median_iqr")
                   add = c("median_iqr", "jitter")) +
   stat_compare_means(aes(group = AgeGroup), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.AgeGroup.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.AgeGroup.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ AgeGroup, group.by = "Gender", data = AERNASE.clin, method = "kruskal.test")
+compare_means(HMOX1 ~ AgeGroup, group.by = "Gender", data = AERNASE.clin, method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin, 
                   x = c("AgeGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Age groups (years) per gender",
-                  ylab = "PCSK9 (normalized expression",
+                  ylab = "HMOX1 (normalized expression",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   # add = "median_iqr")
                   add = c("median_iqr", "jitter")) +
   stat_compare_means(aes(group = Gender), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.AgeGroup_perGender.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.AgeGroup_perGender.pdf"), plot = last_plot())
 
 
 
@@ -211,7 +211,7 @@ table(AERNASE.clin$SBPGroup, AERNASE.clin$Gender)
 
 Now we can draw some graphs of plaque `r TRAIT_OF_INTEREST` levels per sex and hypertension/blood pressure group as median ± interquartile range.
 
-### PCSK9
+### HMOX1
 
 ```{r}
 detach("package:EnsDb.Hsapiens.v86", unload = TRUE)
@@ -221,105 +221,105 @@ detach("package:ensembldb", unload = TRUE)
 
 
 ```{r }
-compare_means(PCSK9 ~ SBPGroup, data = AERNASE.clin %>% filter(!is.na(SBPGroup)), method = "kruskal.test")
+compare_means(HMOX1 ~ SBPGroup, data = AERNASE.clin %>% filter(!is.na(SBPGroup)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(SBPGroup)), 
                   x = c("SBPGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Systolic blood pressure (mmHg)",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "SBPGroup",
                   palette = "npg",
                   add = "jitter") +
   stat_compare_means(aes(group = SBPGroup), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.SBPGroup.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.SBPGroup.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ Hypertension.selfreport, data = AERNASE.clin %>% filter(!is.na(Hypertension.selfreport)), method = "kruskal.test")
+compare_means(HMOX1 ~ Hypertension.selfreport, data = AERNASE.clin %>% filter(!is.na(Hypertension.selfreport)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(Hypertension.selfreport)), 
                   x = c("Hypertension.selfreport"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Self-reported hypertension",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "Hypertension.selfreport",
                   palette = "npg",
                   add = "jitter") +
   stat_compare_means(aes(group = Hypertension.selfreport), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.Hypertension.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.Hypertension.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ Hypertension.drugs, data = AERNASE.clin %>% filter(!is.na(Hypertension.drugs)), method = "kruskal.test")
+compare_means(HMOX1 ~ Hypertension.drugs, data = AERNASE.clin %>% filter(!is.na(Hypertension.drugs)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(Hypertension.drugs)), 
                   x = c("Hypertension.drugs"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Hypertension medication use",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "Hypertension.drugs",
                   palette = "npg",
                   add = "jitter") +
   stat_compare_means(aes(group = Hypertension.drugs), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.HypertensionDrugs.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.HypertensionDrugs.pdf"), plot = last_plot())
 
 
 
-compare_means(PCSK9 ~ SBPGroup, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(SBPGroup)), method = "kruskal.test")
+compare_means(HMOX1 ~ SBPGroup, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(SBPGroup)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(SBPGroup)), 
                   x = c("SBPGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Systolic blood pressure (mmHg) per gender",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Gender), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.SBPGroup_byGender.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.SBPGroup_byGender.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ Hypertension.selfreport, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(Hypertension.selfreport)), method = "kruskal.test")
+compare_means(HMOX1 ~ Hypertension.selfreport, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(Hypertension.selfreport)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(Hypertension.selfreport)), 
                   x = c("Hypertension.selfreport"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Self-reported hypertension per gender",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Gender), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.Hypertension_byGender.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.Hypertension_byGender.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ Hypertension.drugs, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(Hypertension.drugs)), method = "kruskal.test")
+compare_means(HMOX1 ~ Hypertension.drugs, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(Hypertension.drugs)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(Hypertension.drugs)), 
                   x = c("Hypertension.drugs"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Hypertension medication use per gender",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Gender), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.Hypertension.drugs_byGender.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.Hypertension.drugs_byGender.pdf"), plot = last_plot())
 
 
 
-compare_means(PCSK9 ~ SBPGroup, group.by = "Hypertension.drugs", data = AERNASE.clin %>% filter(!is.na(SBPGroup) & !is.na(Hypertension.drugs)), method = "kruskal.test")
+compare_means(HMOX1 ~ SBPGroup, group.by = "Hypertension.drugs", data = AERNASE.clin %>% filter(!is.na(SBPGroup) & !is.na(Hypertension.drugs)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(SBPGroup) & !is.na(Hypertension.drugs)), 
                   x = c("SBPGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Systolic blood pressure (mmHg) by medication use",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "Hypertension.drugs",
                   palette = c("#49A01D", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Hypertension.drugs), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.SBPGroup_byHypertensionDrugs.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.SBPGroup_byHypertensionDrugs.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ Hypertension.selfreport, group.by = "Hypertension.drugs", data = AERNASE.clin %>% filter(!is.na(Hypertension.selfreport) & !is.na(Hypertension.drugs)), method = "kruskal.test")
+compare_means(HMOX1 ~ Hypertension.selfreport, group.by = "Hypertension.drugs", data = AERNASE.clin %>% filter(!is.na(Hypertension.selfreport) & !is.na(Hypertension.drugs)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(Hypertension.selfreport) & !is.na(Hypertension.drugs)), 
                   x = c("Hypertension.selfreport"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Self-reported hypertension per medication use",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "Hypertension.drugs",
                   palette = c("#49A01D", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Hypertension.drugs), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.Hypertension.selfreport_byHypertensionDrugs.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.Hypertension.selfreport_byHypertensionDrugs.pdf"), plot = last_plot())
 
 ```
 
@@ -376,111 +376,111 @@ table(AERNASE.clin$risk614, AERNASE.clin$Hypercholesterolemia)
 
 Now we can draw some graphs of plaque `r TRAIT_OF_INTEREST` levels per sex and hypercholesterolemia/LDL-levels group, as well as stratified by lipid-lowering drugs users as median ± interquartile range.
 
-### PCSK9
+### HMOX1
 
 ```{r }
 
-compare_means(PCSK9 ~ LDLGroup, data = AERNASE.clin %>% filter(!is.na(LDLGroup)), method = "kruskal.test")
+compare_means(HMOX1 ~ LDLGroup, data = AERNASE.clin %>% filter(!is.na(LDLGroup)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(LDLGroup)), 
                   x = c("LDLGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "LDL (mg/dL) per gender",
-                  ylab = "PCSK9 (normalized expression))",
+                  ylab = "HMOX1 (normalized expression))",
                   color = "LDLGroup",
                   palette = "npg",
                   add = "jitter") +
   stat_compare_means(label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.LDLGroups.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.LDLGroups.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ LDLGroup, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(LDLGroup)), method = "kruskal.test")
+compare_means(HMOX1 ~ LDLGroup, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(LDLGroup)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(LDLGroup)), 
                   x = c("LDLGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "LDL (mg/dL) per gender",
-                  ylab = "PCSK9 (normalized expression))",
+                  ylab = "HMOX1 (normalized expression))",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Gender), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.LDLGroups_byGender.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.LDLGroups_byGender.pdf"), plot = last_plot())
 
 
 
-compare_means(PCSK9 ~ Hypercholesterolemia, data = AERNASE.clin %>% filter(!is.na(Hypercholesterolemia)), method = "kruskal.test")
+compare_means(HMOX1 ~ Hypercholesterolemia, data = AERNASE.clin %>% filter(!is.na(Hypercholesterolemia)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(Hypercholesterolemia)), 
                   x = c("Hypercholesterolemia"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Diagnosed hypercholesterolemia",
-                  ylab = "PCSK9 (normalized expression))",
+                  ylab = "HMOX1 (normalized expression))",
                   color = "Hypercholesterolemia",
                   palette = "npg",
                   add = "jitter") +
   stat_compare_means(label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.Hypercholesterolemia.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.Hypercholesterolemia.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ Hypercholesterolemia, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(Hypercholesterolemia)), method = "kruskal.test")
+compare_means(HMOX1 ~ Hypercholesterolemia, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(Hypercholesterolemia)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(Hypercholesterolemia)), 
                   x = c("Hypercholesterolemia"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Diagnosed hypercholesterolemia per gender",
-                  ylab = "PCSK9 (normalized expression))",
+                  ylab = "HMOX1 (normalized expression))",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Gender), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.Hypercholesterolemia_byGender.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.Hypercholesterolemia_byGender.pdf"), plot = last_plot())
 
 
-compare_means(PCSK9 ~ Med.Statin.LLD, data = AERNASE.clin %>% filter(!is.na(Med.Statin.LLD)), method = "kruskal.test")
+compare_means(HMOX1 ~ Med.Statin.LLD, data = AERNASE.clin %>% filter(!is.na(Med.Statin.LLD)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(Med.Statin.LLD)), 
                   x = c("Med.Statin.LLD"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Lipid-lowering drug use",
-                  ylab = "PCSK9 (normalized expression))",
+                  ylab = "HMOX1 (normalized expression))",
                   color = "Med.Statin.LLD",
                   palette = "npg",
                   add = "jitter") +
   stat_compare_means(label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.Med.Statin.LLD.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.Med.Statin.LLD.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ Med.Statin.LLD, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(Med.Statin.LLD)), method = "kruskal.test")
+compare_means(HMOX1 ~ Med.Statin.LLD, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(Med.Statin.LLD)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(Med.Statin.LLD)), 
                   x = c("Med.Statin.LLD"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Lipid-lowering drug use per gender",
-                  ylab = "PCSK9 (normalized expression))",
+                  ylab = "HMOX1 (normalized expression))",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Gender), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.Med.Statin.LLD_byGender.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.Med.Statin.LLD_byGender.pdf"), plot = last_plot())
 
 
 
 
-compare_means(PCSK9 ~ LDLGroup, group.by = "Med.Statin.LLD", data = AERNASE.clin %>% filter(!is.na(LDLGroup) & !is.na(Med.Statin.LLD)), method = "kruskal.test")
+compare_means(HMOX1 ~ LDLGroup, group.by = "Med.Statin.LLD", data = AERNASE.clin %>% filter(!is.na(LDLGroup) & !is.na(Med.Statin.LLD)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(LDLGroup) & !is.na(Med.Statin.LLD)), 
                   x = c("LDLGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "LDL (mg/dL) per LLD use",
-                  ylab = "PCSK9 (normalized expression))",
+                  ylab = "HMOX1 (normalized expression))",
                   color = "Med.Statin.LLD",
                   palette = c("#49A01D", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Med.Statin.LLD), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.LDLGroups_byMed.Statin.LLD.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.LDLGroups_byMed.Statin.LLD.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ Hypercholesterolemia, group.by = "Med.Statin.LLD", data = AERNASE.clin %>% filter(!is.na(Hypercholesterolemia) & !is.na(Med.Statin.LLD)), method = "kruskal.test")
+compare_means(HMOX1 ~ Hypercholesterolemia, group.by = "Med.Statin.LLD", data = AERNASE.clin %>% filter(!is.na(Hypercholesterolemia) & !is.na(Med.Statin.LLD)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(Hypercholesterolemia) & !is.na(Med.Statin.LLD)), 
                   x = c("Hypercholesterolemia"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Diagnosed hypercholesterolemia per LLD use",
-                  ylab = "PCSK9 (normalized expression))",
+                  ylab = "HMOX1 (normalized expression))",
                   color = "Med.Statin.LLD",
                   palette = c("#49A01D", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Med.Statin.LLD), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.LDLGroups_byMed.Statin.LLD.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.LDLGroups_byMed.Statin.LLD.pdf"), plot = last_plot())
 
 
 ```
@@ -509,77 +509,77 @@ table(AERNASE.clin$eGFRGroup, AERNASE.clin$KDOQI)
 
 Now we can draw some graphs of plaque `r TRAIT_OF_INTEREST` levels per sex and kidney function group as median ± interquartile range.
 
-### PCSK9
+### HMOX1
 
 ```{r}
 
 # Global test
 
-compare_means(PCSK9 ~ eGFRGroup, data = AERNASE.clin %>% filter(!is.na(eGFRGroup)), method = "kruskal.test")
+compare_means(HMOX1 ~ eGFRGroup, data = AERNASE.clin %>% filter(!is.na(eGFRGroup)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(eGFRGroup)), 
                   x = c("eGFRGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "eGFR (mL/min per 1.73 m2)",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "eGFRGroup",
                   palette = "npg",
                   add = "jitter") +
   stat_compare_means(method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.EGFR.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.EGFR.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ eGFRGroup, group.by = "Gender",  data = AERNASE.clin %>% filter(!is.na(eGFRGroup)), method = "kruskal.test")
+compare_means(HMOX1 ~ eGFRGroup, group.by = "Gender",  data = AERNASE.clin %>% filter(!is.na(eGFRGroup)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(eGFRGroup)), 
                   x = c("eGFRGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "eGFR (mL/min per 1.73 m2) per gender",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Gender), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.EGFR_byGender.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.EGFR_byGender.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ KDOQI, data = AERNASE.clin %>% filter(!is.na(KDOQI)), method = "kruskal.test")
+compare_means(HMOX1 ~ KDOQI, data = AERNASE.clin %>% filter(!is.na(KDOQI)), method = "kruskal.test")
 p1 <- ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(KDOQI)), 
                   x = c("KDOQI"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Kidney function (KDOQI)",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "KDOQI",
                   palette = "npg",
                   add = "jitter") +
   stat_compare_means(aes(group = KDOQI), label = "p.format", method = "kruskal.test")
 ggpar(p1 + rotate_x_text(45), legend = "right") 
 rm(p1)
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.KDOQI.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.KDOQI.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ KDOQI, group.by = "Gender",   data = AERNASE.clin %>% filter(!is.na(KDOQI)), method = "kruskal.test")
+compare_means(HMOX1 ~ KDOQI, group.by = "Gender",   data = AERNASE.clin %>% filter(!is.na(KDOQI)), method = "kruskal.test")
 p1 <- ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(KDOQI)), 
                   x = c("KDOQI"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Kidney function (KDOQI) per gender",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Gender), label = "p.format", method = "kruskal.test")
 ggpar(p1 + rotate_x_text(45), legend = "right") 
 rm(p1)
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.KDOQI_byGender.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.KDOQI_byGender.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ eGFRGroup,  data = AERNASE.clin %>% filter(!is.na(eGFRGroup) & !is.na(KDOQI)), method = "kruskal.test")
+compare_means(HMOX1 ~ eGFRGroup,  data = AERNASE.clin %>% filter(!is.na(eGFRGroup) & !is.na(KDOQI)), method = "kruskal.test")
 p1 <- ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(eGFRGroup) & !is.na(KDOQI)), 
                   x = c("eGFRGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "eGFR (mL/min per 1.73 m2) by KDOQI group",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "KDOQI",
                   palette = "npg",
                   add = "jitter") +
   stat_compare_means(method = "kruskal.test")
 ggpar(p1, legend = "right")
 rm(p1)
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.EGFR_KDOQI.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.EGFR_KDOQI.pdf"), plot = last_plot())
 
 ```
 
@@ -611,50 +611,50 @@ table(AERNASE.clin$BMIGroup, AERNASE.clin$BMI_WHO)
 
 Now we can draw some graphs of plaque `r TRAIT_OF_INTEREST` levels per sex and age group as median ± interquartile range.
 
-### PCSK9
+### HMOX1
 
 ```{r}
 
 # Global test
-compare_means(PCSK9 ~ BMIGroup,  data = AERNASE.clin %>% filter(!is.na(BMIGroup)), method = "kruskal.test")
+compare_means(HMOX1 ~ BMIGroup,  data = AERNASE.clin %>% filter(!is.na(BMIGroup)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(BMIGroup)), 
                   x = c("BMIGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "BMI groups (kg/m2)",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   # color = "Gender",
                   # palette = c("#D5267B", "#1290D9"),
                   color = "BMIGroup",
                   palette = "npg",
                   add = "jitter") +
   stat_compare_means(label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.BMI.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.BMI.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ BMIGroup, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(BMIGroup)), method = "kruskal.test")
+compare_means(HMOX1 ~ BMIGroup, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(BMIGroup)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(BMIGroup)), 
                   x = c("BMIGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "BMI groups (kg/m2) per gender",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Gender), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.BMI_byGender.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.BMI_byGender.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ BMIGroup,  data = AERNASE.clin %>% filter(!is.na(BMIGroup) & !is.na(BMI_WHO)), method = "kruskal.test")
+compare_means(HMOX1 ~ BMIGroup,  data = AERNASE.clin %>% filter(!is.na(BMIGroup) & !is.na(BMI_WHO)), method = "kruskal.test")
 p1 <- ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(BMIGroup) & !is.na(BMI_WHO)), 
                   x = c("BMIGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "BMI groups (kg/m2) per WHO categories",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "BMI_WHO",
                   palette = "npg",
                   add = "jitter") +
   stat_compare_means(method = "kruskal.test")
 ggpar(p1, legend = "right")
 rm(p1)
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.BMI_byWHO.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.BMI_byWHO.pdf"), plot = last_plot())
 
 ```
 
@@ -666,37 +666,37 @@ We want to create figures of `r TRAIT_OF_INTEREST` levels stratified by type 2 d
 
 Now we can draw some graphs of plaque `r TRAIT_OF_INTEREST` levels per sex and age group as median ± interquartile range.
 
-### PCSK9
+### HMOX1
 
 ```{r per Diabetes per Sex}
 
-compare_means(PCSK9 ~ DiabetesStatus,  
+compare_means(HMOX1 ~ DiabetesStatus,  
               data = AERNASE.clin %>% filter(!is.na(DiabetesStatus)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(DiabetesStatus)),
                   x = c("DiabetesStatus"),
-                  y = "PCSK9",
+                  y = "HMOX1",
                   xlab = "Diabetes status",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   # color = "Gender",
                   # palette = c("#D5267B", "#1290D9"),
                   color = "DiabetesStatus",
                   palette = "npg",
                   add = c("median_iqr", "jitter")) +
   stat_compare_means(label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.Diabetes.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.Diabetes.pdf"), plot = last_plot())
 
 
-compare_means(PCSK9 ~ DiabetesStatus, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(DiabetesStatus)), method = "kruskal.test")
+compare_means(HMOX1 ~ DiabetesStatus, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(DiabetesStatus)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(DiabetesStatus)),
                   x = c("DiabetesStatus"),
-                  y = "PCSK9",
+                  y = "HMOX1",
                   xlab = "Diabetes status per gender",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   add = c("median_iqr", "jitter")) +
   stat_compare_means(aes(group = Gender), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.Diabetes_byGender.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.Diabetes_byGender.pdf"), plot = last_plot())
   
 
 ```
@@ -709,36 +709,36 @@ We want to create figures of `r TRAIT_OF_INTEREST` levels stratified by smoking.
 
 Now we can draw some graphs of plaque `r TRAIT_OF_INTEREST` levels per sex and age group as median ± interquartile range.
 
-### PCSK9 
+### HMOX1 
 
 ```{r per Smoking per Sex}
 
 # Global test
-compare_means(PCSK9 ~ SmokerStatus,  data = AERNASE.clin %>% filter(!is.na(SmokerStatus)), method = "kruskal.test")
+compare_means(HMOX1 ~ SmokerStatus,  data = AERNASE.clin %>% filter(!is.na(SmokerStatus)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(SmokerStatus)), 
                   x = c("SmokerStatus"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Smoker status",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   # color = "Gender",
                   # palette = c("#D5267B", "#1290D9"),
                   color = "SmokerStatus",
                   palette = "npg",
                   add = c("median_iqr", "jitter")) +
   stat_compare_means(label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.Smoking.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.Smoking.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ SmokerStatus, group.by ="Gender", data = AERNASE.clin %>% filter(!is.na(SmokerStatus)), method = "kruskal.test")
+compare_means(HMOX1 ~ SmokerStatus, group.by ="Gender", data = AERNASE.clin %>% filter(!is.na(SmokerStatus)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(SmokerStatus)), 
                   x = c("SmokerStatus"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Smoker status per gender",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   add = c("median_iqr", "jitter")) +
   stat_compare_means(aes(group = Gender), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.Smoking_byGender.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.Smoking_byGender.pdf"), plot = last_plot())
 
 ```
 
@@ -767,36 +767,36 @@ table(AERNASE.clin$stenose, AERNASE.clin$StenoticGroup)
 
 Now we can draw some graphs of plaque `r TRAIT_OF_INTEREST` levels per sex and age group as median ± interquartile range.
 
-### PCSK9
+### HMOX1
 
 ```{r per Stenosis per Sex}
 
 # Global test
-compare_means(PCSK9 ~ StenoticGroup,  data = AERNASE.clin %>% filter(!is.na(StenoticGroup)), method = "kruskal.test")
+compare_means(HMOX1 ~ StenoticGroup,  data = AERNASE.clin %>% filter(!is.na(StenoticGroup)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(StenoticGroup)), 
                   x = c("StenoticGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Stenotic grade",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   # color = "Gender",
                   # palette = c("#D5267B", "#1290D9"),
                   color = "StenoticGroup",
                   palette = "npg",
                   add = "jitter") +
   stat_compare_means(label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.Stenosis.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.Stenosis.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ StenoticGroup, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(StenoticGroup)), method = "kruskal.test")
+compare_means(HMOX1 ~ StenoticGroup, group.by = "Gender", data = AERNASE.clin %>% filter(!is.na(StenoticGroup)), method = "kruskal.test")
 ggpubr::ggboxplot(AERNASE.clin %>% filter(!is.na(StenoticGroup)), 
                   x = c("StenoticGroup"),
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Stenotic grade per gender",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Gender), label = "p.format", method = "kruskal.test")
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.Stenosis_byGender.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.Stenosis_byGender.pdf"), plot = last_plot())
 
 ```
 
@@ -815,7 +815,7 @@ table(AERNASE.clin$AsymptSympt2G)
 
 Now we can draw some graphs of plaque `r TRAIT_OF_INTEREST` levels per symptom group as median ± interquartile range.
 
-### PCSK9
+### HMOX1
 
 ```{r per SymptomGroups}
 
@@ -823,10 +823,10 @@ Now we can draw some graphs of plaque `r TRAIT_OF_INTEREST` levels per symptom g
 my_comparisons <- list(c("Asymptomatic", "Symptomatic"))
 
 p1 <- ggpubr::ggboxplot(AERNASE.clin, 
-                  x = "AsymptSympt2G", y = "PCSK9",
-                  title = "PCSK9 (normalized expression) levels per symptom", 
+                  x = "AsymptSympt2G", y = "HMOX1",
+                  title = "HMOX1 (normalized expression) levels per symptom", 
                   xlab = "Symptoms",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "AsymptSympt2G", 
                   # palette = c(uithof_color[16], uithof_color[23]),
                   palette = "npg",
@@ -836,16 +836,16 @@ p1 <- ggpubr::ggboxplot(AERNASE.clin,
   stat_compare_means(comparisons = my_comparisons, method = "wilcox.test")
 ggpar(p1, legend = c("right"), legend.title = "Symptoms")
 
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.AsymptSympt2G.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.AsymptSympt2G.pdf"), plot = last_plot())
 
 rm(p1)
 
-compare_means(PCSK9 ~ AsymptSympt2G, group.by = "Gender", data = AERNASE.clin, method = "kruskal.test")
+compare_means(HMOX1 ~ AsymptSympt2G, group.by = "Gender", data = AERNASE.clin, method = "kruskal.test")
 p1 <- ggpubr::ggboxplot(AERNASE.clin, 
-                  x = "AsymptSympt2G", y = "PCSK9",
-                  title = "PCSK9 (normalized expression) levels per symptom by gender", 
+                  x = "AsymptSympt2G", y = "HMOX1",
+                  title = "HMOX1 (normalized expression) levels per symptom by gender", 
                   xlab = "Symptoms",
-                  ylab = "PCSK9 (normalized expression)",
+                  ylab = "HMOX1 (normalized expression)",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   add = "dotplot", # Add dotplot
@@ -854,7 +854,7 @@ p1 <- ggpubr::ggboxplot(AERNASE.clin,
   stat_compare_means(aes(group = Gender), label = "p.format",  method = "wilcox.test")
 ggpar(p1, legend = c("right"), legend.title = "Symptoms")
 
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.AsymptSympt2G.byGender.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.AsymptSympt2G.byGender.pdf"), plot = last_plot())
 
 rm(p1)
 
@@ -879,26 +879,26 @@ models_target
 
 Forest plots.
 
-### PCSK9
+### HMOX1
 
 ```{r forestplots}
 dat <- data.frame(group = factor(c("Age, sex-adjusted", "Age, sex, and adjusted for risk factors"), 
                            
                            levels=c("Age, sex, and adjusted for risk factors", "Age, sex-adjusted")),
-                  cen = c(models_target$OR[models_target$Predictor=="PCSK9"]),
-                  low = c(models_target$low95CI[models_target$Predictor=="PCSK9"]),
-                  high = c(models_target$up95CI[models_target$Predictor=="PCSK9"]))
+                  cen = c(models_target$OR[models_target$Predictor=="HMOX1"]),
+                  low = c(models_target$low95CI[models_target$Predictor=="HMOX1"]),
+                  high = c(models_target$up95CI[models_target$Predictor=="HMOX1"]))
 
 fp <- ggplot(data = dat, aes(x = group, y = cen, ymin = low, ymax = high)) +
   geom_pointrange(linetype = 2, size = 1, colour = c("#1290D9", "#49A01D")) + 
   geom_hline(yintercept = 1, lty = 2) +  # add a dotted line at x=1 after flip
   coord_flip(ylim = c(0.8, 1.7)) +  # flip coordinates (puts labels on y axis)
   xlab("Model") + ylab("OR (95% CI) for symptomatic plaques") +
-  ggtitle("Plaque PCSK9 normalized expression (1 SD increment, n = 622)") +
+  ggtitle("Plaque HMOX1 normalized expression (1 SD increment, n = 622)") +
   theme_minimal()  # use a white background
 print(fp)
 
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9.plaque.forest.pdf"), plot = fp)
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1.plaque.forest.pdf"), plot = fp)
 
 rm(fp)
 ```
@@ -954,6 +954,7 @@ names(AEDB.CEA)[names(AEDB.CEA) == "VEFGA"] <- "VEGFA"
 
 # fix names
 names(AERNASE.clin)[names(AERNASE.clin) == "IL6"] <- "IL6rna"
+names(AERNASE.clin)[names(AERNASE.clin) == "MMP9"] <- "MMP9rna"
 
 cytokines <- c("IL2", "IL4", "IL5", "IL6", "IL8", "IL9", "IL10", "IL12", "IL13", "IL21", 
                "INFG", "TNFA", "MIF", "MCP1", "MIP1a", "RANTES", "MIG", "IP10", "Eotaxin1", 
@@ -1016,9 +1017,9 @@ for(PROTEIN in 1:length(proteins_of_interest)){
 We will just visualize these transformations.
 
 ```{r Target vs Cytokines Histograms}
-proteins_of_interest_rank_target <- c("PCSK9", proteins_of_interest_rank)
+proteins_of_interest_rank_target <- c("HMOX1", proteins_of_interest_rank)
 
-proteins_of_interest_target <- c("PCSK9", proteins_of_interest)
+proteins_of_interest_target <- c("HMOX1", proteins_of_interest)
 
 for(PROTEIN_GENE in proteins_of_interest_target){
   cat(paste0("Plotting protein ", PROTEIN_GENE, ".\n"))
@@ -1091,7 +1092,7 @@ corr_biomarkers.rank <- round(cor(matrix.RANK,
                              method = "spearman"), 3)
 # corr_biomarkers.rank
 
-rename_proteins_of_interest_target <- c("PCSK9 (RNA)", 
+rename_proteins_of_interest_target <- c("HMOX1 (RNA)", 
                                     "IL2", "IL4", "IL5", "IL6", "IL8", "IL9", "IL10", "IL12", 
                                     "IL13 (L)", "IL21 (L)", 
                                     "INFG", "TNFA", "MIF (L)", 
@@ -1159,10 +1160,10 @@ rm(p1)
 
 While visually attractive we are not necessarily interested in the correlations between all the cytokines, rather of `r TRAIT_OF_INTEREST`` with other cytokines only.
 
-### PCSK9 
+### HMOX1 
 
 ```{r Target vs Cytokines barplot}
-temp <- subset(corr_biomarkers.rank.df, Cytokine_X == "PCSK9 (RNA)" )
+temp <- subset(corr_biomarkers.rank.df, Cytokine_X == "HMOX1 (RNA)" )
 temp$p_log10 <- -log10(temp$p)
 p_threshold <- -log10(0.05/nrow(temp))
 p_threshold
@@ -1187,8 +1188,8 @@ ggpar(p1, legend = "bottom",
         axis.title.y = element_text(size = 18)) +
   labs(y = expression(paste("Spearman's"~italic(rho))))
 
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9_vs_Cytokines.png"), plot = last_plot())
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9_vs_Cytokines.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1_vs_Cytokines.png"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1_vs_Cytokines.pdf"), plot = last_plot())
 rm(p1)
 
 
@@ -1196,7 +1197,7 @@ rm(p1)
 
 Another version - probably not good. 
 ```{r}
-temp <- subset(corr_biomarkers.rank.df, Cytokine_X == "PCSK9 (RNA)" )
+temp <- subset(corr_biomarkers.rank.df, Cytokine_X == "HMOX1 (RNA)" )
 temp$p_log10 <- -log10(temp$p)
 p_threshold <- -log10(0.05/nrow(temp))
 p_threshold
@@ -1223,8 +1224,8 @@ ggpar(p1, legend = "",
         axis.title.y = element_text(size = 18)) +
   labs(y = expression(log[10]~"("~italic(p)~")-value"))
 
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9_vs_Cytokines.dotchart.png"), plot = last_plot())
-ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".PCSK9_vs_Cytokines.dotchart.pdf"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1_vs_Cytokines.dotchart.png"), plot = last_plot())
+ggsave(file = paste0(PLOT_loc, "/",Today,".AERNASE.clin.",TRAIT_OF_INTEREST,".HMOX1_vs_Cytokines.dotchart.pdf"), plot = last_plot())
 
 rm(temp, p1)
 
@@ -1419,67 +1420,67 @@ table(AERNASE.clin$ORyearGroup, AERNASE.clin$ORdate_year)
 
 ### Visualisations
 
-#### PCSK9
+#### HMOX1
 
 ```{r per PlaqueVulnerabilityIndex}
 # Global test
 
-compare_means(PCSK9 ~ Plaque_Vulnerability_Index,  data = AERNASE.clin, method = "kruskal.test")
+compare_means(HMOX1 ~ Plaque_Vulnerability_Index,  data = AERNASE.clin, method = "kruskal.test")
 p1 <- ggpubr::ggboxplot(AERNASE.clin, 
                   x = "Plaque_Vulnerability_Index",
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Plaque vulnerability index",
-                  ylab = "PCSK9 (normalized expression)\n",
+                  ylab = "HMOX1 (normalized expression)\n",
                   color = "Plaque_Vulnerability_Index",
                   palette = "npg",
                   add = "jitter") +
   stat_compare_means(label = "p.format",  method = "kruskal.test")
 ggpar(p1, legend = "bottom", legend.title = "Plaque vulnerability index")
-ggsave(filename = paste0(PLOT_loc, "/", Today, ".",TRAIT_OF_INTEREST,".PCSK9.plaque.PlaqueVulnerabilityIndex.pdf"), plot = last_plot())
+ggsave(filename = paste0(PLOT_loc, "/", Today, ".",TRAIT_OF_INTEREST,".HMOX1.plaque.PlaqueVulnerabilityIndex.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ Plaque_Vulnerability_Index, group.by = "Gender", data = AERNASE.clin, method = "kruskal.test")
+compare_means(HMOX1 ~ Plaque_Vulnerability_Index, group.by = "Gender", data = AERNASE.clin, method = "kruskal.test")
 p2 <- ggpubr::ggboxplot(AERNASE.clin, 
                   x = "Plaque_Vulnerability_Index",
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Plaque vulnerability index by gender",
-                  ylab = "PCSK9 (normalized expression)\n",
+                  ylab = "HMOX1 (normalized expression)\n",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   add = "jitter") +
   stat_compare_means(aes(group = Gender), label = "p.format",  method = "kruskal.test")
 ggpar(p2, legend = "bottom", legend.title = "Plaque vulnerability index")
-ggsave(filename = paste0(PLOT_loc, "/", Today, ".",TRAIT_OF_INTEREST,".PCSK9.plaque.PlaqueVulnerabilityIndex.byGender.pdf"), plot = last_plot())
+ggsave(filename = paste0(PLOT_loc, "/", Today, ".",TRAIT_OF_INTEREST,".HMOX1.plaque.PlaqueVulnerabilityIndex.byGender.pdf"), plot = last_plot())
 
 
 
 
-compare_means(PCSK9 ~ Plaque_Vulnerability_Index, data = AERNASE.clin, method = "kruskal.test")
+compare_means(HMOX1 ~ Plaque_Vulnerability_Index, data = AERNASE.clin, method = "kruskal.test")
 p5 <- ggpubr::ggboxplot(AERNASE.clin, 
                   x = "Plaque_Vulnerability_Index",
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Plaque vulnerability index",
-                  ylab = "PCSK9 (normalized expression)\n",
+                  ylab = "HMOX1 (normalized expression)\n",
                   color = "Plaque_Vulnerability_Index",
                   palette = "npg",
                   facet.by = "ORyearGroup",
                   add = "jitter") +
   stat_compare_means(label = "p.format",  method = "kruskal.test")
 ggpar(p5, legend = "bottom", legend.title = "Plaque vulnerability index")
-ggsave(filename = paste0(PLOT_loc, "/", Today, ".",TRAIT_OF_INTEREST,".PCSK9.plaque.PlaqueVulnerabilityIndex_Facet_byYear.pdf"), plot = last_plot())
+ggsave(filename = paste0(PLOT_loc, "/", Today, ".",TRAIT_OF_INTEREST,".HMOX1.plaque.PlaqueVulnerabilityIndex_Facet_byYear.pdf"), plot = last_plot())
 
-compare_means(PCSK9 ~ Plaque_Vulnerability_Index, group.by = "Gender", data = AERNASE.clin, method = "kruskal.test")
+compare_means(HMOX1 ~ Plaque_Vulnerability_Index, group.by = "Gender", data = AERNASE.clin, method = "kruskal.test")
 p6 <- ggpubr::ggboxplot(AERNASE.clin, 
                   x = "Plaque_Vulnerability_Index",
-                  y = "PCSK9", 
+                  y = "HMOX1", 
                   xlab = "Plaque vulnerability index",
-                  ylab = "PCSK9 (normalized expression)\n",
+                  ylab = "HMOX1 (normalized expression)\n",
                   color = "Gender",
                   palette = c("#D5267B", "#1290D9"),
                   facet.by = "ORyearGroup",
                   add = "jitter") +
   stat_compare_means(aes(group = Gender), label = "p.format",  method = "kruskal.test")
 ggpar(p6, legend = "bottom", legend.title = "Plaque vulnerability index")
-ggsave(filename = paste0(PLOT_loc, "/", Today, ".",TRAIT_OF_INTEREST,".PCSK9.plaque.PlaqueVulnerabilityIndex_Facet_byYear.byGender.pdf"), plot = last_plot())
+ggsave(filename = paste0(PLOT_loc, "/", Today, ".",TRAIT_OF_INTEREST,".HMOX1.plaque.PlaqueVulnerabilityIndex_Facet_byYear.byGender.pdf"), plot = last_plot())
 
 ```
 
@@ -1493,7 +1494,7 @@ Here we use the inverse-rank normalized data - visually this is more normally di
 Analysis of the plaque vulnerability index as a function of plaque `r TRAIT_OF_INTEREST` levels.
 
 ```{r CrossSec: Plaque_Vulnerability_Index - ordinal regression MODEL1 RANK, paged.print=TRUE}
-TRAITS.TARGET.RANK.extra = c("PCSK9")
+TRAITS.TARGET.RANK.extra = c("HMOX1")
 
 GLM.results <- data.frame(matrix(NA, ncol = 16, nrow = 0))
 for (protein in 1:length(TRAITS.TARGET.RANK.extra)) {
