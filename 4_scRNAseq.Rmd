@@ -29,7 +29,7 @@ knit: worcs::cite_all
 
 # General Setup
 ```{r echo = FALSE}
-rm(list = ls())
+# rm(list = ls())
 ```
 
 ```{r LocalSystem, echo = FALSE}
@@ -45,8 +45,8 @@ source("scripts/pack03.packages.R")
 ```
 
 ```{r Setting: Colors}
-Today = format(as.Date(as.POSIXlt(Sys.time())), "%Y%m%d")
-Today.Report = format(as.Date(as.POSIXlt(Sys.time())), "%A, %B %d, %Y")
+# Today = format(as.Date(as.POSIXlt(Sys.time())), "%Y%m%d")
+# Today.Report = format(as.Date(as.POSIXlt(Sys.time())), "%A, %B %d, %Y")
 source("scripts/colors.R")
 ```
 
@@ -435,43 +435,61 @@ scRNAseqDataCEA39@meta.data <- dplyr::rename(scRNAseqDataCEA39@meta.data, "STUDY
 
 # Verify that the new metadata was added correctly
 head(scRNAseqDataCEA39@meta.data)
+# rm(original_metadata_df, merged_metadata_df, new_metadata_columns, new_meta_info_df)
+
+```
+
+```{r}
+str(scRNAseqDataCEA39[[]])
 
 ```
 
 ## Saving new dataset
 
 ```{r}
-temp2 <- as_tibble(subset(scRNAseqDataCEA39@meta.data, select = c("STUDY_NUMBER", "orig.ident", "nCount_RNA", "nFeature_RNA",
-                                                                 "Plate", "Batch", "C.H", "Type", "percent.mt",
-                                                                 "nCount_SCT", "nFeature_SCT", "seurat_clusters")))
+# Get the SampleList
+temp2 <- as_tibble(subset(scRNAseqDataCEA39@meta.data, 
+                          select = c("STUDY_NUMBER", "cell.ident", "nCount_RNA", "nFeature_RNA",
+                                     "Plate", "Batch", "C.H", "Type", "percent.mt",
+                                     "percent.KCNQ1OT1", "percent.UGDH.AS1", "percent.GHET1", "percent.ROR1.AS1",
+                                     "nCount_SCT", "nFeature_SCT", "seurat_clusters", "SCT_snn_res.1.25",
+                                     "S.Score", "G2M.Score", "Phase")))
+# Get the ClinicalData
+temp <- as_tibble(subset(scRNAseqDataCEA39@meta.data, 
+                          select = c("STUDY_NUMBER", "cell.ident", 
+                                     "Phenotype", 
+                                     "CD68.score", "CD3.score", "CD34.score", "alpha.SMA.score", 
+                                     "SR.score", "Glyc.c.score", "Calcification", variables_of_interest)))
 
-# fwrite(temp2,
-#        file = paste0(OUT_loc, "/", Today, ".AESCRNA.CEA.39pts.samplelist.after_qc.IC_commercial.csv"),
-#        sep = ",", row.names = FALSE, col.names = TRUE,
-#        showProgress = TRUE)
-# rm(temp2)
-# 
-# temp <- dplyr::rename(temp, "STUDY_NUMBER" = "Patient")
-# fwrite(temp,
-#        file = paste0(OUT_loc, "/", Today, ".AESCRNA.CEA.39pts.clinicaldata.after_qc.IC_commercial.csv"),
-#        sep = ",", row.names = FALSE, col.names = TRUE,
-#        showProgress = TRUE)
-# rm(temp)
-# 
-# saveRDS(scRNAseqDataCEA39, file = paste0(OUT_loc, "/", Today, ".AESCRNA.CEA.39pts.Seurat.after_qc.IC_commercial.RDS"))
 
+# Get the counts
+temp3 <- as_tibble(scRNAseqDataCEA39@assays$RNA@counts, rownames = "GeneSymbol")
+temp4 <- as_tibble(scRNAseqDataCEA39@assays$SCT@counts, rownames = "GeneSymbol")
+  
 fwrite(temp2,
        file = paste0(OUT_loc, "/", Today, ".AESCRNA.CEA.39pts.samplelist.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp2)
 
-temp <- dplyr::rename(temp, "STUDY_NUMBER" = "Patient")
 fwrite(temp,
        file = paste0(OUT_loc, "/", Today, ".AESCRNA.CEA.39pts.clinicaldata.after_qc.IC_academic.csv"),
        sep = ",", row.names = FALSE, col.names = TRUE,
        showProgress = TRUE)
 rm(temp)
+
+fwrite(temp3,
+       file = paste0(OUT_loc, "/", Today, ".AESCRNA.CEA.39pts.RNAcounts.after_qc.IC_academic.csv"),
+       sep = ",", row.names = FALSE, col.names = TRUE,
+       showProgress = TRUE)
+rm(temp3)
+
+fwrite(temp4,
+       file = paste0(OUT_loc, "/", Today, ".AESCRNA.CEA.39pts.SCTcounts.after_qc.IC_academic.csv"),
+       sep = ",", row.names = FALSE, col.names = TRUE,
+       showProgress = TRUE)
+rm(temp4)
+
 
 saveRDS(scRNAseqDataCEA39, file = paste0(OUT_loc, "/", Today, ".AESCRNA.CEA.39pts.Seurat.after_qc.IC_academic.RDS"))
 
