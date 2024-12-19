@@ -142,17 +142,17 @@ We can examine the contents of the Athero-Express Biobank dataset to know what e
 
 There is an excellent post on this: <https://www.r-bloggers.com/working-with-spss-labels-in-r/>.
 
-```{r AEDB: describe}
-AEDB %>% sjPlot::view_df(show.type = TRUE,
-                         show.frq = TRUE,
-                         show.prc = TRUE,
-                         show.na = TRUE, 
-                         max.len = TRUE, 
-                         wrap.labels = 20,
-                         verbose = FALSE, 
-                         use.viewer = FALSE,
-                         file = paste0(OUT_loc, "/", Today, ".AEDB.dictionary.html")) 
-```
+<!-- ```{r AEDB: describe} -->
+<!-- AEDB %>% sjPlot::view_df(show.type = TRUE, -->
+<!--                          show.frq = TRUE, -->
+<!--                          show.prc = TRUE, -->
+<!--                          show.na = TRUE,  -->
+<!--                          max.len = TRUE,  -->
+<!--                          wrap.labels = 20, -->
+<!--                          verbose = FALSE,  -->
+<!--                          use.viewer = FALSE, -->
+<!--                          file = paste0(OUT_loc, "/", Today, ".AEDB.dictionary.html"))  -->
+<!-- ``` -->
 
 ## Fixing and creating variables
 
@@ -860,6 +860,97 @@ p1 | p2
 ```
 
 
+## Fix hormones
+
+There are few hormones or precursors thereoff that we are interested in. These are:
+
+- Estradiol, pmol/L, measured at LKCH 2016
+- Testosterone, nmol/L, measured at LKCH 2016
+- SHB, nmol/L, measured at LKCH 2016
+
+First, we will prepare the variables. Consider also that a few values are not valid:
+
+-777	- below detection limit			
+-666	- too little material
+
+We must make sure that these are coded as missing values.
+
+```{r}
+# Create new variables out of the original
+AEDB$Estradiol_plasma <- as.numeric(AEDB$Estradiol) 
+AEDB$Testosterone_plasma <- as.numeric(AEDB$Testosterone) 
+AEDB$SHBG_plasma <- as.numeric(AEDB$SHBG) 
+
+# Fix the missing values
+AEDB$Estradiol_plasma[AEDB$Estradiol_plasma == -777] <- NA
+AEDB$Estradiol_plasma[AEDB$Estradiol_plasma == -666] <- NA
+AEDB$Testosterone_plasma[AEDB$Testosterone_plasma == -777] <- NA
+AEDB$Testosterone_plasma[AEDB$Testosterone_plasma == -666] <- NA
+AEDB$SHBG_plasma[AEDB$SHBG_plasma == -777] <- NA
+AEDB$SHBG_plasma[AEDB$SHBG_plasma == -666] <- NA
+
+# Convert the unit for Estradiol to nmol/L
+AEDB$Estradiol_plasma <- AEDB$Estradiol_plasma * 0.001
+
+# Rank normalize the new variables
+AEDB$Estradiol_plasma_rankNorm <- qnorm((rank(AEDB$Estradiol_plasma, na.last = "keep") - 0.5) / sum(!is.na(AEDB$Estradiol_plasma)))
+AEDB$Testosterone_plasma_rankNorm <- qnorm((rank(AEDB$Testosterone_plasma, na.last = "keep") - 0.5) / sum(!is.na(AEDB$Testosterone_plasma)))
+AEDB$SHBG_plasma_rankNorm <- qnorm((rank(AEDB$SHBG_plasma, na.last = "keep") - 0.5) / sum(!is.na(AEDB$SHBG_plasma)))
+
+```
+
+Second, we want to create a histogram using `ggpubr` for each of the hormones prior to and after inverse-rank normal transformation.
+
+```{r}
+library(labelled)
+AEDB$Gender <- to_factor(AEDB$Gender)
+library(patchwork)
+
+# Create a for loop to create the histograms and make sure that the display is within the for loop, as is the combined for loop. 
+hormone_list <- c("Estradiol_plasma", "Testosterone_plasma", "SHBG_plasma")
+hormone_rankNorm_list <- c("Estradiol_plasma_rankNorm", "Testosterone_plasma_rankNorm", "SHBG_plasma_rankNorm")
+
+# Loop through the raw and rank-normalized hormones
+for (i in seq_along(hormone_list)) {
+  HORMONE <- hormone_list[i]
+  HORMONE_rankNorm <- hormone_rankNorm_list[i]
+  
+  # Rename variables for display in title and xlab
+  if (HORMONE == "Estradiol_plasma") {
+    HORMONE_name <- "Estradiol"
+  } else if (HORMONE == "Testosterone_plasma") {
+    HORMONE_name <- "Testosterone"
+  } else if (HORMONE == "SHBG_plasma") {
+    HORMONE_name <- "SHBG"
+  }
+  
+  # Raw hormone data histogram
+  p1 <- ggpubr::gghistogram(AEDB, HORMONE, 
+                            color = "white",
+                            fill = "Gender",
+                            palette = c("#1290D9", "#DB003F"), 
+                            add = "median", 
+                            rug = TRUE,
+                            title = paste0(HORMONE_name),
+                            xlab = paste0(HORMONE_name, " in citrate plasma (nmol/L)"),
+                            ggtheme = theme_minimal())
+  
+  # Rank-normalized hormone data histogram
+  p2 <- ggpubr::gghistogram(AEDB, HORMONE_rankNorm, 
+                            color = "white",
+                            fill = "Gender",
+                            palette = c("#1290D9", "#DB003F"), 
+                            add = "median", 
+                            rug = TRUE,
+                            xlab = paste0(HORMONE_name, " in citrate plasma (nmol/L)\ninverse-rank normalized"),
+                            ggtheme = theme_minimal())
+  
+  # Display combined graphs for each hormone
+  print(p1 / ggpar(p2, legend = "none"))
+}
+```
+
+
 ## Prepare baseline summary
 
 We are interested in the following variables at baseline.
@@ -892,6 +983,9 @@ We are interested in the following variables at baseline.
 -   stenosis
 -   year of surgery
 -   plaque characteristics
+-   Estradiol
+-   Testosterone
+-   SHBG
 
 ```{r Baseline AEDB: preparation}
 cat("====================================================================================================\n")
@@ -992,6 +1086,13 @@ AEDB$EP_major_time <- as.numeric(AEDB$EP_major_time)
 
 AEDB$PCSK9_plasma <- as.numeric(AEDB$PCSK9_plasma)
 AEDB$PCSK9_plasma_rankNorm <- as.numeric(AEDB$PCSK9_plasma_rankNorm)
+
+AEDB$Estradiol_plasma <- as.numeric(AEDB$Estradiol_plasma)
+AEDB$Testosterone_plasma <- as.numeric(AEDB$Testosterone_plasma)
+AEDB$SHBG_plasma <- as.numeric(AEDB$SHBG_plasma)
+AEDB$Estradiol_plasma_rankNorm <- as.numeric(AEDB$Estradiol_plasma_rankNorm)
+AEDB$Testosterone_plasma_rankNorm <- as.numeric(AEDB$Testosterone_plasma_rankNorm)
+AEDB$SHBG_plasma_rankNorm <- as.numeric(AEDB$SHBG_plasma_rankNorm)
 
 require(labelled)
 AEDB$ORyear <- to_factor(AEDB$ORyear)
@@ -1126,7 +1227,9 @@ basetable_vars = c("Hospital", "ORyear",
                    "Calc.bin", "Collagen.bin", 
                    "Fat.bin_10", "Fat.bin_40", 
                    "OverallPlaquePhenotype", "Plaque_Vulnerability_Index",
-                   "PCSK9_plasma", "PCSK9_plasma_rankNorm")
+                   "PCSK9_plasma", "PCSK9_plasma_rankNorm",
+                   "Estradiol_plasma", "Testosterone_plasma", "SHBG_plasma",
+                   "Estradiol_plasma_rankNorm", "Testosterone_plasma_rankNorm", "SHBG_plasma_rankNorm")
 
 basetable_bin = c("Gender", 
                   "KDOQI", "BMI_WHO",
@@ -1301,7 +1404,9 @@ CONVOCALS.samplelist.withduplicates <- subset(AEDB.CEA, select =
                                                   "OverallPlaquePhenotype", "Plaque_Vulnerability_Index",
                                                   "EP_composite", "EP_composite_time", "EP_major", "EP_major_time",
                                                   "sympt", "AsymptSympt", "AsymptSympt2G",  "Symptoms.5G", 
-                                                  "indexsymptoms_latest_4g", "Symptoms.Update2G", "Symptoms.Update3G", "TimeOR_latest4G") # new symptom-categories
+                                                  "indexsymptoms_latest_4g", "Symptoms.Update2G", "Symptoms.Update3G", "TimeOR_latest4G", # new symptom-categories
+                                                  "Estradiol_plasma", "Testosterone_plasma", "SHBG_plasma", # raw hormones
+                                                  "Estradiol_plasma_rankNorm", "Testosterone_plasma_rankNorm", "SHBG_plasma_rankNorm") # rank normalized hormones
                                               )
 
 CONVOCALS.samplelist.withduplicates$arteryop <- to_factor(CONVOCALS.samplelist.withduplicates$arteryop)
@@ -1611,8 +1716,8 @@ openxlsx::write.xlsx(CONVOCALS.samplelist.SMA,
 
 ------------------------------------------------------------------------------------------------------------------------
 
-    Version:      v1.0.9
-    Last update:  2024-10-17
+    Version:      v1.1.0
+    Last update:  2024-12-19
     Written by:   Sander W. van der Laan (s.w.vanderlaan-2[at]umcutrecht.nl).
     Description:  Script to get some Athero-Express Biobank Study baseline characteristics.
     Minimum requirements: R version 4.3.1 (2023-06-16) -- "Beagle Scouts", Mac OS X Sonoma (14.0, beta 5, 23A5312d)
@@ -1628,6 +1733,7 @@ openxlsx::write.xlsx(CONVOCALS.samplelist.SMA,
     _W_
 
     **Changes log**
+    * v1.10.0 Added sex-hormones raw and rank-normalized Estradiol, Testosterone, and SHBG.
     * v1.0.9 Created baseline table for CONVOCALS. Changed the organisation of CONVOCALS: one GitHub repository is for the (generic) MIL-model-code, the other for the CONVOCALS-project specific code.
     * v1.0.8 Added EVG files, type, filename, and stain information.
     * v1.0.7 Check presence SMA and HE files, including type, filename, and stain. Added Excel-export.
