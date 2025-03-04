@@ -1,29 +1,38 @@
-## CONVOCALS: a CONVOlutional neural network to predict symptoms and major secondary CArdiovascuLar events based on high-resolution scanned histological Slides.
+## Intraplaque haemorrhage quantification and molecular characterisation using attention based multiple instance learning
 
 [![DOI]()]()
 
 <!-- Please add a brief introduction to explain what the project is about    -->
-Francesco Cisternino<sup>5\*</sup>, Yipei Song<sup>1\*</sup>, Gert Jan de Borst<sup>2</sup>, Joost Mekke<sup>2</sup>, Barend Mol<sup>2</sup>, Dominique P.V. de Kleijn<sup>2</sup>, Gerard Pasterkamp<sup>3</sup>, Aryan Vink<sup>4</sup>, Sander W. van der Laan<sup>3\*</sup>, Clint L. Miller<sup>1\*</sup>, Craig Glastonbury<sup>5\*</sup>. \* Authors contributed equally.
+Francesco Cisternino<sup>1*</sup>, Yipei Song<sup>2*</sup>, Tim S. Peters<sup>3*</sup>, Roderick Westerman<sup>3</sup>, Gert J. de Borst<sup>4</sup>, Ernest Diez Benavente<sup>3</sup>, Noortje A.M. van den Dungen<sup>3</sup>, Petra Homoed-van der Kraak<sup>5</sup>, Dominique P.V. de Kleijn<sup>4</sup>, Joost Mekke<sup>4</sup>, Michal Mokry<sup>3</sup>, Gerard Pasterkamp<sup>3</sup>, Hester M. den Ruijter<sup>3,6</sup>, Evelyn Velema<sup>6</sup>, Clint L. Miller<sup>2*</sup>, Craig A. Glastonbury<sup>1,7*</sup>, S.W. van der Laan<sup>2,3*</sup>.
 
-<sup>1) Center for Public Health Genomics, Department of Public Health Sciences, Department of Biochemistry and Molecular Genetics, University of Virginia, Charlottesville, VA 22908, USA. 2) Department of Vascular Surgery, Division Surgical Specialties, University Medical Center Utrecht, Utrecht University, Utrecht, the Netherlands. 3) Central Diagnostics Laboratory, Division Laboratories, Pharmacy, and Biomedical Genetics, University Medical Center Utrecht, Utrecht University, Utrecht, the Netherlands. 4) Department of Pathology, Division Laboratories, Pharmacy, and Biomedical Genetics, University Medical Center Utrecht, Utrecht University, Utrecht, the Netherlands. 5) Human Technopole, Viale Rita Levi-Montalcini, 1, 20157, Milano, Italy.</sup>
+<sup>* these authors contributed equally</sup>
+
+_**Affiliations**_
+_<sup>1</sup> Human Technopole, Viale Rita Levi-Montalcini 1, 20157, Milan, Italy._
+_<sup>2</sup> Department of Genome Sciences, University of Virginia, Charlottesville, VA, USA._
+_<sup>3</sup> Central Diagnostic Laboratory, Division Laboratories, Pharmacy, and Biomedical genetics,  University Medical Center Utrecht, Utrecht University, Utrecht, the Netherlands. _
+_<sup>4</sup> Vascular surgery, University Medical Center Utrecht, Utrecht University, Utrecht, the Netherlands. _
+_<sup>5</sup> Pathology, University Medical Center Utrecht, Utrecht University, Utrecht, the Netherlands. _
+_<sup>6</sup> Experimental Cardiology, Department Cardiology, Division Heart & Lungs, University Medical Center Utrecht, Utrecht University, Utrecht, the Netherlands._
+_<sup>7</sup> Nuffield Department of Medicine, University of Oxford, Oxford, UK._
 
 
 ### Background
 
-Despite tremendous medical progress, cardiovascular diseases (CVD) are still topping global charts of morbidity and mortality. Atherosclerosis is the major underlying cause of CVD and results in atherosclerotic plaque formation. The extent and type of atherosclerosis is manually assessed through histological analysis, and histological characteristics are linked to major acute cardiovascular events (MACE). However, conventional means of assessing plaque characteristics suffer major limitations directly impacting their predictive power. CONVOCALS will use a machine learning technique, convolutional neural network (CNN), to develop an internal representation of the 2-dimensional plaque images, allowing the model to learn position and scale in variant structures in the data.  A CNN is a subset of deep learning which has established as a powerful class of models for image recognition problems such as analysis of x-ray medical images. The aim of CONVOCALS is to build a CNN to process high-resolution images from scanned histological slides of plaques in order to predict MACE. 
+Intraplaque haemorrhage (IPH) represents a critical feature of plaque vulnerability as it is robustly associated with adverse cardiovascular events, including stroke and myocardial infarction. How IPH drives plaque instability is unknown. However, its identification and quantification in atherosclerotic plaques is currently performed manually, with high inter-observer variability, limiting its accurate assessment in large cohorts. Leveraging the Athero-Express biobank, an ongoing study comprising a comprehensive dataset of histological, transcriptional, and clinical information from 2,595 carotid endarterectomy patients, we developed an attention-based additive multiple instance learning (MIL) framework to automate the detection and quantification of IPH across whole-slide images of nine distinct histological stains. We demonstrate that routinely available Haematoxylin and Eosin (H&E) staining outperformed all other plaque relevant Immunohistochemistry (IHC) stains tested (AUROC = 0.86), underscoring its utility in quantifying IPH. When combining stains through ensemble models, we see that H&E + CD68 (a macrophage marker) as well as H&E + Verhoeff-Van Gieson elastic fibers staining (EVG) leads to a substantial improvement (AUROC = 0.92). Using our model, we could derive IPH area from the MIL-derived patch-level attention scores, enabling not only classification but precise localisation and quantification of IPH area in each plaque, facilitating downstream analyses of its association and cellular composition with clinical outcomes. By doing so, we demonstrate that IPH presence and area are the most significant predictors of both preoperative symptom presentation and major adverse cardiovascular events (MACE), outperforming manual scoring methods. Automating IPH detection also allowed us to characterise IPH on a molecular level at scale. Pairing IPH measurements with single-cell transcriptomic analyses revealed key molecular pathways involved in IPH, including TNF-α signalling, extracellular matrix remodelling and the presence of foam cells. This study represents the largest effort in the cardiovascular field to integrate digital pathology, machine learning, and molecular data to predict and characterize IPH which leads to better understanding how it drives  symptoms and MACE. Our model provides a scalable, interpretable, and reproducible method for plaque phenotyping, enabling the derivation of plaque phenotypes for predictive modelling of MACE outcomes.
 
 
 #### Study design
 
-We will use data from the [*Athero-Express Biobank Study (AE)*](https://doi.org/10.1007/s10564-004-2304-6){target="_blank"} comprising ±2,500 carotid endarterectomy patients of whom extensive clinical data (demographic, lifestyle, laboratory, medical history, and medication) as well as plaques are collected. At two Dutch tertiary referral centers patients are included that underwent endarterectomy; details of the study design were described [before](https://doi.org/10.1007/s10564-004-2304-6){target="_blank"}. Briefly, blood and plaque material were obtained during endarterectomy and stored at -80 ℃. Only carotid endarterectomy (CEA) patients were included in the present study. All patients provided informed consent and the study was approved by the medical ethics committee.
-All plaques are histological assessed using 9 different standardized protocols for CD34, CD66b, CD68, SMA, elastin, hematoxylin, picro-sirius red, fibrin, glycophorin C and scanned at high-resolution into `.ndpi` or `.TIF` whole-slide images (WSI). For CONVOCALS we will use all the available data, i.e. ± 22,500 images and clinical data, to build a CNN using advanced computer algorithms as implemented in Python and classify patients based on 1) symptoms, and 2) MACE.
+We will use data from the [*Athero-Express Biobank Study (AE)*](https://doi.org/10.1007/s10564-004-2304-6) comprising ±2,500 carotid endarterectomy patients of whom extensive clinical data (demographic, lifestyle, laboratory, medical history, and medication) as well as plaques are collected. At two Dutch tertiary referral centers patients are included that underwent endarterectomy; details of the study design were described [before](https://doi.org/10.1007/s10564-004-2304-6){target="_blank"}. Briefly, blood and plaque material were obtained during endarterectomy and stored at -80 ℃. Only carotid endarterectomy (CEA) patients were included in the present study. All patients provided informed consent and the study was approved by the medical ethics committee.
+All plaques are histological assessed using 9 different standardized protocols for CD34, CD66b, CD68, SMA, elastin, hematoxylin, picro-sirius red, fibrin, glycophorin C and scanned at high-resolution into `.ndpi` or `.TIF` whole-slide images (WSI). For this project we will use all the available data from carotid plaques, i.e. 16,171 images and clinical data, to build a multiple instance learning model to predict intraplaque haemorrhage.
 
 
 <!-- Please add a brief introduction to explain what the project is about    -->
 
 ### Where do I start?
 
-You can load this project in RStudio by opening the file called 'CONVOCALS.Rproj'.
+You can load this project in RStudio by opening the file called 'PHENOMICL_downstream.Rproj'.
 
 ### Project structure
 
@@ -31,12 +40,23 @@ You can load this project in RStudio by opening the file called 'CONVOCALS.Rproj
 File                | Description                | Usage         
 ------------------- | -------------------------- | --------------
 README.md           | Description of project     | Human editable
-CONVOCALS.Rproj     | Project file               | Loads project 
+PHENOMICL_downstream.Rproj     | Project file               | Loads project 
 LICENSE             | User permissions           | Read only     
 .worcs              | WORCS metadata YAML        | Read only     
 renv.lock           | Reproducible R environment | Read only     
 images              | Images used in readme, etc | Human editable
 scripts             | Script to process data     | Human editable
+targets             | Script to process data     | Human editable
+references.bib             | References     | Human editable
+packages.bib             | References for packages    | Human editable
+BASELINE             | Baseline characteristics     | Human editable
+OUTPUT             | Other outputs    | Human editable
+results             | Results from downstream analyses     | Human editable
+1. AEDB.CEA.baseline.nb.html             | R notebook in HTML     | Read only
+1. AEDB.CEA.baseline.Rmd             | R notebook to parse the clinical data     | Human editable
+3_1_bulkRNAseq.preparation.nb.html             | R notebook in HTML     | Read only
+3_1_bulkRNAseq.preparation.Rmd             | R notebook to parse the RNAseq data     | Human editable
+
 
 <!--  You can consider adding the following to this file:                    -->
 <!--  * A citation reference for your project                                -->
@@ -74,11 +94,11 @@ Do you have burning questions or do you want to discuss usage with other users? 
 
 ### Citations
 
-Using our **`EntropyMasker`** method? Please cite our work:
+Using our **`PHENOMICL`** method? Please cite our work:
 
-    An automatic entropy method to efficiently mask histology whole-slide images
-    Yipei Song, Francesco Cisternino, Joost Mekke, Gert Jan de Borst, Dominique P.V. de Kleijn, Gerard Pasterkamp, Aryan Vink, Craig Glastonbury, Sander W. van der Laan, Clint L. Miller.
-    medRxiv 2022.09.01.22279487; doi: https://doi.org/10.1101/2022.09.01.22279487
+    Intraplaque haemorrhage quantification and molecular characterisation using attention based multiple instance learning
+    Francesco Cisternino, Yipei Song, Tim S. Peters, Roderick Westerman, Gert J. de Borst, Ernest Diez Benavente, Noortje A.M. van den Dungen, Petra Homoed-van der Kraak, Dominique P.V. de Kleijn, Joost Mekke, Michal Mokry, Gerard Pasterkamp, Hester M. den Ruijter, Evelyn Velema, Clint L. Miller, Craig A. Glastonbury, S.W. van der Laan.
+    medRxiv ; doi: 
 
 
 ### Data availability
@@ -101,8 +121,8 @@ The framework was based on the [`WORCS` package](https://osf.io/zcvbs/).
 
 #### Changes log
 
-    Version:      v1.1.0
-    Last update:  2024-10-17
+    Version:      v1.2.0
+    Last update:  2025-03-04
     Written by:   Francesco Cisternino; Craig Glastonbury; Sander W. van der Laan; Clint L. Miller; Yipei Song.
     Description:  CONVOCALS repository: classification of atherosclerotic histological whole-slide images
     Minimum requirements: R version 3.4.3 (2017-06-30) -- 'Single Candle', Mac OS X El Capitan
@@ -118,6 +138,7 @@ The framework was based on the [`WORCS` package](https://osf.io/zcvbs/).
     _W_
     
     Changes log
+    * v1.2.0 Major updates and re-organization prior to submission.
     * v1.1.0 Major updates and re-organization. Added baseline table creation. Added WORCS metadata. Added details on funding. Added bulkRNAseq analyses. Added scRNAseq analyses.
     * v1.0.1 Updates and re-organization.
     * v1.0.0 Initial version. 
@@ -126,7 +147,7 @@ The framework was based on the [`WORCS` package](https://osf.io/zcvbs/).
 --------------
 
 #### Creative Commons BY-NC-ND 4.0
-##### Copyright (c) 2024 [Francesco Cisternino]() \| [Craig Glastonbury](https://github.com/GlastonburyC) \| [Sander W. van der Laan](https://github.com/swvanderlaan) \| [Clint L. Miller](https://github.com/clintmil) \| [Yipei Song](https://github.com/PetraSong) 
+##### Copyright (c) 2025 [Francesco Cisternino]() \| [Craig Glastonbury](https://github.com/GlastonburyC) \| [Sander W. van der Laan](https://github.com/swvanderlaan) \| [Clint L. Miller](https://github.com/clintmil) \| [Yipei Song](https://github.com/PetraSong) 
 
 <sup>This is a human-readable summary of (and not a substitute for) the [license](LICENSE). </sup>
 </br>
