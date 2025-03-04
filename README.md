@@ -7,13 +7,13 @@ Francesco Cisternino<sup>1*</sup>, Yipei Song<sup>2*</sup>, Tim S. Peters<sup>3*
 
 <sup>* these authors contributed equally</sup>
 
-_**Affiliations**_
-_<sup>1</sup> Human Technopole, Viale Rita Levi-Montalcini 1, 20157, Milan, Italy._
-_<sup>2</sup> Department of Genome Sciences, University of Virginia, Charlottesville, VA, USA._
-_<sup>3</sup> Central Diagnostic Laboratory, Division Laboratories, Pharmacy, and Biomedical genetics,  University Medical Center Utrecht, Utrecht University, Utrecht, the Netherlands. _
-_<sup>4</sup> Vascular surgery, University Medical Center Utrecht, Utrecht University, Utrecht, the Netherlands. _
-_<sup>5</sup> Pathology, University Medical Center Utrecht, Utrecht University, Utrecht, the Netherlands. _
-_<sup>6</sup> Experimental Cardiology, Department Cardiology, Division Heart & Lungs, University Medical Center Utrecht, Utrecht University, Utrecht, the Netherlands._
+_**Affiliations**_<br>
+_<sup>1</sup> Human Technopole, Viale Rita Levi-Montalcini 1, 20157, Milan, Italy;_ 
+_<sup>2</sup> Department of Genome Sciences, University of Virginia, Charlottesville, VA, USA;_ 
+_<sup>3</sup> Central Diagnostic Laboratory, Division Laboratories, Pharmacy, and Biomedical genetics,  University Medical Center Utrecht, Utrecht University, Utrecht, the Netherlands;_ 
+_<sup>4</sup> Vascular surgery, University Medical Center Utrecht, Utrecht University, Utrecht, the Netherlands;_ 
+_<sup>5</sup> Pathology, University Medical Center Utrecht, Utrecht University, Utrecht, the Netherlands;_ 
+_<sup>6</sup> Experimental Cardiology, Department Cardiology, Division Heart & Lungs, University Medical Center Utrecht, Utrecht University, Utrecht, the Netherlands;_ 
 _<sup>7</sup> Nuffield Department of Medicine, University of Oxford, Oxford, UK._
 
 
