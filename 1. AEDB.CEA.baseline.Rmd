@@ -1,6 +1,6 @@
 ---
 title: "Baseline characteristics"
-subtitle: Accompanying 'CONVOCALS_downstream'
+subtitle: Accompanying 'PHENOMICL_downstream'
 author: '[Sander W. van der Laan, PhD](https://vanderlaanand.science) | s.w.vanderlaan[at]gmail[dot]com'
 date: "`r Sys.Date()`"
 output:

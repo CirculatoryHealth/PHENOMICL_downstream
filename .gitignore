@@ -82,9 +82,9 @@ _archive*
 # PolarMorphism/proxySearch_CAC_CAD*
 
 # Sample data
-*.CONVOCALS.samplelist.no*slides.xlsx
-*.CONVOCALS.samplelist.xlsx
-*.CONVOCALS.samplelist.with*slides.xlsx
+*.samplelist.no*slides.xlsx
+*.samplelist.xlsx
+*.samplelist.with*slides.xlsx
 
 # checkpoints
 checkpoint_ts.pth
