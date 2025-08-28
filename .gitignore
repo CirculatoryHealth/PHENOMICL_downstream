@@ -98,3 +98,8 @@ AtheroExpressCLAM/results
 AtheroExpressCLAM/eval_results
 gwas_cad_1million/GWASCatalog/
 _archive
+
+# WSI data
+WSI_BIKE
+WSI_TUM
+
